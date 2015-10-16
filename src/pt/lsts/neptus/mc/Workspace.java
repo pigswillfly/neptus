@@ -106,6 +106,7 @@ import pt.lsts.neptus.gui.swing.NeptusFileView;
 import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.loader.FileHandler;
 import pt.lsts.neptus.mra.NeptusMRA;
+import no.ntnu.thermalcamcontrol.gui.ThermalCamControlGui;
 import pt.lsts.neptus.types.checklist.ChecklistType;
 import pt.lsts.neptus.types.vehicle.VehicleType;
 import pt.lsts.neptus.types.vehicle.VehiclesHolder;
@@ -164,6 +165,7 @@ public class Workspace extends JFrame implements IFrameOpener, FileHandler {
     private static ImageIcon GC_ICON = ImageUtils.createScaleImageIcon("images/buttons/gc.png", 16, 16);
     private static ImageIcon IMC_ICON = ImageUtils.createScaleImageIcon("images/imc.png", 16, 16);
     private static ImageIcon REC_MOUSE_ICON = ImageUtils.createScaleImageIcon("images/menus/recIcon16.png", 16, 16);
+    private static ImageIcon THERMAL_CAM_ICON = ImageUtils.createScaleImageIcon("images/thermal_cam.ico", 16, 16);
 
     private JPanel jContentPane = null;
     private JMenuBar jJMenuBar = null;
@@ -441,6 +443,8 @@ public class Workspace extends JFrame implements IFrameOpener, FileHandler {
             toolsMenu.addSeparator();
             toolsMenu.add(getLatLonConvMenuItem());
             toolsMenu.add(getChronometerMenuItem());
+            toolsMenu.addSeparator();
+            toolsMenu.add(getThermalCamControlGuiMenuItem());
             toolsMenu.addMenuListener(HideMenusListener.forge(new Component[] { separator1, separator2 },
                     new JMenuItem[] { getViewer3DMenuItem() }));
         }
@@ -485,6 +489,23 @@ public class Workspace extends JFrame implements IFrameOpener, FileHandler {
             });
         }
         return imcMsgSenderMenuItem;
+    }
+    
+    JMenuItem thermalCamControlGuiMenuItem = null;
+    
+    private JMenuItem getThermalCamControlGuiMenuItem() {
+        if(thermalCamControlGuiMenuItem == null) {
+           thermalCamControlGuiMenuItem = new JMenuItem();
+           thermalCamControlGuiMenuItem.setIcon(THERMAL_CAM_ICON);
+           thermalCamControlGuiMenuItem.setText(I18n.text("FLIR Tau 2 Camera Controller"));
+           thermalCamControlGuiMenuItem.addActionListener(new ActionListener() {
+              @Override
+              public void actionPerformed(ActionEvent arg0) {
+                  ThermalCamControlGui.getFrame();
+              }
+           });
+        }
+        return thermalCamControlGuiMenuItem;
     }
 
     /**
