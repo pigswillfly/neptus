@@ -165,7 +165,7 @@ public class Workspace extends JFrame implements IFrameOpener, FileHandler {
     private static ImageIcon GC_ICON = ImageUtils.createScaleImageIcon("images/buttons/gc.png", 16, 16);
     private static ImageIcon IMC_ICON = ImageUtils.createScaleImageIcon("images/imc.png", 16, 16);
     private static ImageIcon REC_MOUSE_ICON = ImageUtils.createScaleImageIcon("images/menus/recIcon16.png", 16, 16);
-    private static ImageIcon THERMAL_CAM_ICON = ImageUtils.createScaleImageIcon("images/thermal_cam.ico", 16, 16);
+    private static ImageIcon THERMAL_CAM_ICON = ImageUtils.createScaleImageIcon("images/thermal_cam.png", 16, 16);
 
     private JPanel jContentPane = null;
     private JMenuBar jJMenuBar = null;
