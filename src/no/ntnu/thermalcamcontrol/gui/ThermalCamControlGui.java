@@ -102,6 +102,9 @@ public class ThermalCamControlGui extends JPanel {
         this.setLayout(new BorderLayout());
         add(contentPanel, BorderLayout.CENTER);
         
+        // Send IMC message function code 0x00 to verify camera connection
+        // How to get reply? 
+        
     }
     
     private JTabbedPane getTabPanel(){
