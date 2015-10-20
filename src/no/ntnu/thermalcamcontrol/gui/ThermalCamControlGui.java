@@ -64,6 +64,7 @@ public class ThermalCamControlGui extends JFrame {
         JFrame frame = GuiUtils.testFrame(getTabPanel());
         frame.setSize(835, 675);
         frame.setTitle("FLIR Tau 2 Camera Control GUI");
+        GuiUtils.setLookAndFeel();
 
         frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         return frame;
