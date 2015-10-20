@@ -102,7 +102,7 @@ class DigitalPanel extends JPanel {
     private JPanel getXpBusControlPanel(){
         
         if(xpBusControlPanel == null)
-            xpBusControlPanel = new JPanel();
+            xpBusControlPanel = new XpBusControlPanel();
         return xpBusControlPanel;
         
     }
