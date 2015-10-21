@@ -41,38 +41,53 @@ import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle;
+
+import com.google.common.eventbus.Subscribe;
+
 import javax.swing.JPanel;
 
+import pt.lsts.imc.ThermalCamControl;
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.console.ConsolePanel;
+import pt.lsts.neptus.console.plugins.MainVehicleChangeListener;
+import pt.lsts.neptus.plugins.PluginDescription;
+import pt.lsts.neptus.plugins.PluginDescription.CATEGORY;
 import pt.lsts.neptus.util.ImageUtils;
 
 /**
  * @author Elizabeth Roy
  *
  */
-public class ThermalCamControlGui extends ConsolePanel {
+@PluginDescription(name = "FLIR Tau 2 Camera Controls", author = "lizroy", version = "0.1", category = CATEGORY.INTERFACE)
+public class ThermalCamControlGui extends ConsolePanel implements MainVehicleChangeListener{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
 
-    //   private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
- //           "images/thermal_cam.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
- //   private static ImageIcon ICON_BIG = new ImageIcon(ImageUtils.getImage(
- //           "images/thermal_cam.png").getScaledInstance(48, 48, Image.SCALE_SMOOTH));
-//    private static ImageIcon GREEN_LIGHT = new ImageIcon(ImageUtils.getImage(
- //           "images/green_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
- //   private static ImageIcon YELLOW_LIGHT = new ImageIcon(ImageUtils.getImage(
- //           "images/yellow_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));   
+    private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
+            "images/thermal_cam.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
+    private static ImageIcon ICON_BIG = new ImageIcon(ImageUtils.getImage(
+            "images/thermal_cam.png").getScaledInstance(48, 48, Image.SCALE_SMOOTH));
+    private static ImageIcon GREEN_LIGHT = new ImageIcon(ImageUtils.getImage(
+            "images/green_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
+    private static ImageIcon YELLOW_LIGHT = new ImageIcon(ImageUtils.getImage(
+            "images/yellow_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));   
     private static ImageIcon RED_LIGHT = new ImageIcon(ImageUtils.getImage(
             "images/red_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
       
     private JTabbedPane tabPanel = null;
+    
     private JPanel bottomPanel = null;
+    private JLabel connectedLabel = null;
+    private JLabel partNumberLabel = null;
+    private JLabel serialNumberLabel = null;
+    private JLabel statusLabel = null;
+    
     private static JMenuBar thermalCamMenuBar = null;
     
     //private PeriodicThermalCamConnectedQuery connectionStatusUpdater = null;
@@ -133,15 +148,17 @@ public class ThermalCamControlGui extends ConsolePanel {
         if(bottomPanel == null){
             
             bottomPanel = new JPanel();
-            JLabel connectedLabel = new JLabel();
-            JLabel partNumberLabel = new JLabel();
-            JLabel serialNumberLabel = new JLabel();
+            connectedLabel = new JLabel();
+            partNumberLabel = new JLabel();
+            serialNumberLabel = new JLabel();
+            statusLabel = new JLabel();
             
             bottomPanel.setPreferredSize(new java.awt.Dimension(866, 60));
             connectedLabel.setIcon(RED_LIGHT);
             connectedLabel.setText("Not connected");
             partNumberLabel.setText("Part #:");
             serialNumberLabel.setText("Serial #:");
+            statusLabel.setText("No status");
             
             GroupLayout bottomPanelLayout = new GroupLayout(bottomPanel);
             bottomPanel.setLayout(bottomPanelLayout);
@@ -150,7 +167,9 @@ public class ThermalCamControlGui extends ConsolePanel {
                 .addGroup(GroupLayout.Alignment.TRAILING, bottomPanelLayout.createSequentialGroup()
                     .addGap(52, 52, 52)
                     .addComponent(connectedLabel)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 429, Short.MAX_VALUE)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
+                    .addComponent(statusLabel)
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
                     .addGroup(bottomPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(serialNumberLabel)
                         .addComponent(partNumberLabel))
@@ -162,6 +181,7 @@ public class ThermalCamControlGui extends ConsolePanel {
                     .addContainerGap()
                     .addGroup(bottomPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(connectedLabel)
+                        .addComponent(statusLabel)
                         .addComponent(partNumberLabel))
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(serialNumberLabel)
@@ -179,10 +199,12 @@ public class ThermalCamControlGui extends ConsolePanel {
             JMenu viewMenu = new JMenu();
             JMenu cameraMenu = new JMenu();
             JMenu toolsMenu = new JMenu();
+            JMenuItem connectMenuItem = new JMenuItem();
             
             viewMenu.setText("View");
             thermalCamMenuBar.add(viewMenu);
     
+            cameraMenu.add(connectMenuItem);
             cameraMenu.setText("Camera");
             thermalCamMenuBar.add(cameraMenu);
     
@@ -193,6 +215,58 @@ public class ThermalCamControlGui extends ConsolePanel {
         return thermalCamMenuBar;
     }
 
+    private void updateStatus(short status){
+        switch(status){
+            case 0x00:
+                statusLabel.setText("CAM OK");
+                break;
+            case 0x01:
+                
+                break;
+            default: 
+                statusLabel.setText("No status");
+        }
+    }
+    
+    private void sendConnectRequest(){
+        if(connectedLabel.getIcon() == RED_LIGHT){
+            connectedLabel.setIcon(YELLOW_LIGHT);
+            connectedLabel.setText("Connecting...");
+        }
+        ThermalCamControl msg = new ThermalCamControl();
+        msg.setProcessCode((short)0x6E);
+        send(msg);  
+    }
+    
+    private void updateConnected(boolean connected){
+        if(connected == true){
+            connectedLabel.setIcon(GREEN_LIGHT);
+            connectedLabel.setText("Connected");
+        }
+        else{
+            connectedLabel.setIcon(RED_LIGHT);
+            connectedLabel.setText("Not connected");
+        }
+    }
+    
+    // Thermal Cam Control message listener
+    @Subscribe
+    public void on(ThermalCamControl msg){
+        if(msg.getSourceName().equals(getConsole().getMainSystem())){
+            if (msg.getProcessCode() == 0x6E){
+                // valid message
+                
+                updateStatus(msg.getStatus());
+
+                switch(msg.getFunction())
+                {
+                    case 0x00:
+                        updateConnected(true);
+                }
+            }
+        }
+    }
+    
     /* (non-Javadoc)
      * @see pt.lsts.neptus.console.ConsolePanel#cleanSubPanel()
      */
