@@ -49,17 +49,24 @@ class XpBusControlPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JRadioButton xpBusControl14bitRadioButton = null;
+    private JLabel xpBusControlLabel = null;
+    private JRadioButton xpBusControlOffRadioButton = null;
+    private JRadioButton xpBusControl8bitRadioButton = null;
+    private ButtonGroup xpBusControlButtonGroup = null;
+    
     protected XpBusControlPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JRadioButton xpBusControl14bitRadioButton = new JRadioButton();
-        JLabel xpBusControlLabel = new JLabel();
-        JRadioButton xpBusControlOffRadioButton = new JRadioButton();
-        JRadioButton xpBusControl8bitRadioButton = new JRadioButton();
-        ButtonGroup xpBusControlButtonGroup = new ButtonGroup();
+        
+        xpBusControl14bitRadioButton = new JRadioButton();
+        xpBusControlLabel = new JLabel();
+        xpBusControlOffRadioButton = new JRadioButton();
+        xpBusControl8bitRadioButton = new JRadioButton();
+        xpBusControlButtonGroup = new ButtonGroup();
         
         xpBusControlButtonGroup.add(xpBusControlOffRadioButton);
         xpBusControlButtonGroup.add(xpBusControl8bitRadioButton);

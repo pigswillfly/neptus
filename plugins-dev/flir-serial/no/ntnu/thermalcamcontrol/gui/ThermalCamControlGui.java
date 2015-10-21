@@ -38,30 +38,29 @@ import javax.swing.GroupLayout;
 import java.awt.Image;
 
 import javax.swing.ImageIcon;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JTabbedPane;
 import javax.swing.LayoutStyle;
-import javax.swing.WindowConstants;
 import javax.swing.JPanel;
 
-import pt.lsts.neptus.util.GuiUtils;
+import pt.lsts.neptus.console.ConsoleLayout;
+import pt.lsts.neptus.console.ConsolePanel;
 import pt.lsts.neptus.util.ImageUtils;
 
 /**
  * @author Elizabeth Roy
  *
  */
-public class ThermalCamControlGui extends JPanel {
+public class ThermalCamControlGui extends ConsolePanel {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
-    
- //   private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
+
+    //   private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
  //           "images/thermal_cam.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
  //   private static ImageIcon ICON_BIG = new ImageIcon(ImageUtils.getImage(
  //           "images/thermal_cam.png").getScaledInstance(48, 48, Image.SCALE_SMOOTH));
@@ -76,7 +75,10 @@ public class ThermalCamControlGui extends JPanel {
     private JPanel bottomPanel = null;
     private static JMenuBar thermalCamMenuBar = null;
     
-    public ThermalCamControlGui(){
+    //private PeriodicThermalCamConnectedQuery connectionStatusUpdater = null;
+    
+    public ThermalCamControlGui(ConsoleLayout console){
+        super(console);
         initialize();
     }
     
@@ -100,10 +102,10 @@ public class ThermalCamControlGui extends JPanel {
                     .addComponent(bottomPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
         this.setLayout(new BorderLayout());
-        add(contentPanel, BorderLayout.CENTER);
+        this.add(contentPanel, BorderLayout.CENTER);
         
-        // Send IMC message function code 0x00 to verify camera connection
-        // How to get reply? 
+        //connectionStatusUpdater = new PeriodicThermalCamConnectedQuery();
+        //connectionStatusUpdater.startWorking();
         
     }
     
@@ -169,7 +171,7 @@ public class ThermalCamControlGui extends JPanel {
         return bottomPanel;
     }
     
-    private static JMenuBar getMenuBar(){
+    public static JMenuBar getMenuBar(){
         
         if(thermalCamMenuBar == null){
             
@@ -190,19 +192,23 @@ public class ThermalCamControlGui extends JPanel {
         
         return thermalCamMenuBar;
     }
-    
-    /**
-     * 
+
+    /* (non-Javadoc)
+     * @see pt.lsts.neptus.console.ConsolePanel#cleanSubPanel()
      */
-    public static JFrame getFrame() {
-        JFrame frame = GuiUtils.testFrame(new ThermalCamControlGui());
-        frame.setSize(875,750);
-        frame.setLocation(500,100);
-        frame.setTitle("FLIR Tau 2 Camera Control GUI");       
-        frame.setJMenuBar(getMenuBar());
-        GuiUtils.setLookAndFeel();
-        frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-        return frame;
+    @Override
+    public void cleanSubPanel() {
+        // TODO Auto-generated method stub
+        
     }
-    
+
+    /* (non-Javadoc)
+     * @see pt.lsts.neptus.console.ConsolePanel#initSubPanel()
+     */
+    @Override
+    public void initSubPanel() {
+        // TODO Auto-generated method stub
+        
+    }
+
 }

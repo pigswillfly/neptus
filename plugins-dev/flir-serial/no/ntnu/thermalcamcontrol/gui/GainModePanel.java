@@ -50,17 +50,23 @@ class GainModePanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel gainModeLabel = null;
+    private JRadioButton gainModeLowRadioButton = null;
+    private JRadioButton gainModeHighRadioButton = null;
+    private JRadioButton gainModeAutoRadioButton = null;
+    private ButtonGroup gainModeButtonGroup = null;
+    
     protected GainModePanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel gainModeLabel = new JLabel();
-        JRadioButton gainModeLowRadioButton = new JRadioButton();
-        JRadioButton gainModeHighRadioButton = new JRadioButton();
-        JRadioButton gainModeAutoRadioButton = new JRadioButton();
-        ButtonGroup gainModeButtonGroup = new ButtonGroup();
+        gainModeLabel = new JLabel();
+        gainModeLowRadioButton = new JRadioButton();
+        gainModeHighRadioButton = new JRadioButton();
+        gainModeAutoRadioButton = new JRadioButton();
+        gainModeButtonGroup = new ButtonGroup();
         
         gainModeButtonGroup.add(gainModeAutoRadioButton);
         gainModeButtonGroup.add(gainModeLowRadioButton);

@@ -48,14 +48,17 @@ class EightBitDigitalChannelOptionsPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel eightBitDigitalChannelOptionsLabel = null; 
+    private JCheckBox digitalEZoomEnableCheckBox = null;
+    
     protected EightBitDigitalChannelOptionsPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel eightBitDigitalChannelOptionsLabel = new JLabel(); 
-        JCheckBox digitalEZoomEnableCheckBox = new JCheckBox();
+        eightBitDigitalChannelOptionsLabel = new JLabel(); 
+        digitalEZoomEnableCheckBox = new JCheckBox();
         
         this.setBorder(BorderFactory.createEtchedBorder());
 

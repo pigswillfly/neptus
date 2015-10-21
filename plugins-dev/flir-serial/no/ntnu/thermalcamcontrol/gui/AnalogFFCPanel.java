@@ -47,6 +47,11 @@ class AnalogFFCPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private JLabel analogFFCLabel = null;
+    private JLabel ffcWarningLabel = null;
+    private JTextField ffcWarningText = null;
+    private JLabel ffcWarningUnitLabel = null;
 
     protected AnalogFFCPanel(){
         super();
@@ -55,10 +60,10 @@ class AnalogFFCPanel extends JPanel {
     
     private void initialize(){
         
-        JLabel analogFFCLabel = new JLabel();
-        JLabel ffcWarningLabel = new JLabel();
-        JTextField ffcWarningText = new JTextField();
-        JLabel ffcWarningUnitLabel = new JLabel();
+        analogFFCLabel = new JLabel();
+        ffcWarningLabel = new JLabel();
+        ffcWarningText = new JTextField();
+        ffcWarningUnitLabel = new JLabel();
         
         this.setBorder(BorderFactory.createEtchedBorder());
 

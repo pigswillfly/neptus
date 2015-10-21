@@ -48,18 +48,25 @@ class LvdsControlPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
-
+    
+    private JRadioButton lvdsControl8bitRadioButton = null;
+    private JRadioButton lvdsControlOffRadioButton = null;
+    private JRadioButton lvdsControl14bitRadioButton = null;
+    private JLabel lvdsControlLabel = null;
+    private ButtonGroup lvdsControlButtonGroup = null;
+    
     protected LvdsControlPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JRadioButton lvdsControl8bitRadioButton = new JRadioButton();
-        JRadioButton lvdsControlOffRadioButton = new JRadioButton();
-        JRadioButton lvdsControl14bitRadioButton = new JRadioButton();
-        JLabel lvdsControlLabel = new JLabel();
-        ButtonGroup lvdsControlButtonGroup = new ButtonGroup();        
+        lvdsControl8bitRadioButton = new JRadioButton();
+        lvdsControlOffRadioButton = new JRadioButton();
+        lvdsControl14bitRadioButton = new JRadioButton();
+        lvdsControlLabel = new JLabel();
+        lvdsControlButtonGroup = new ButtonGroup();    
+        
         lvdsControlButtonGroup.add(lvdsControlOffRadioButton);
         lvdsControlButtonGroup.add(lvdsControl8bitRadioButton);
         lvdsControlButtonGroup.add(lvdsControl14bitRadioButton);

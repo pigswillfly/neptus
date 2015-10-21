@@ -102,6 +102,7 @@ import pt.lsts.neptus.console.actions.OpenConsoleAction;
 import pt.lsts.neptus.console.actions.OpenImcMonitorAction;
 import pt.lsts.neptus.console.actions.OpenMRAAction;
 import pt.lsts.neptus.console.actions.OpenMissionConsoleAction;
+import pt.lsts.neptus.console.actions.OpenThermalCamControlGuiAction;
 import pt.lsts.neptus.console.actions.RunChecklistConsoleAction;
 import pt.lsts.neptus.console.actions.SaveAsConsoleAction;
 import pt.lsts.neptus.console.actions.SaveConsoleAction;
@@ -494,6 +495,7 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
          * TOOLS MENU
          */
         JMenu tools = new JMenu(I18n.text("Tools"));
+        
         ConsoleAction openMRA = new OpenMRAAction();
         actions.put(OpenMRAAction.class, openMRA);
         tools.add(openMRA);
@@ -501,12 +503,14 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
         ConsoleAction runChecklist = new RunChecklistConsoleAction(this);
         actions.put(RunChecklistConsoleAction.class, runChecklist);
         tools.add(runChecklist);
+        
         menuBar.add(tools);
 
         /*
          * Advanced
          */
         JMenu advanced = new JMenu(I18n.text("Advanced"));
+        
         TakeSnapshotConsoleAction takeSnapshot = new TakeSnapshotConsoleAction(this);
         actions.put(TakeSnapshotConsoleAction.class, takeSnapshot);
         advanced.add(takeSnapshot);
@@ -530,7 +534,7 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
         OpenImcMonitorAction imcMonitor = new OpenImcMonitorAction(this);
         actions.put(OpenImcMonitorAction.class, imcMonitor);
         advanced.add(imcMonitor);
-
+        
         menuBar.add(advanced);
         advanced.addMenuListener(HideMenusListener.forge(new Component[0],
                 new JMenuItem[] { getJMenuForAction(OpenImcMonitorAction.class) }));
@@ -539,6 +543,14 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
         includeHelpMenu();
 
         includeExtraMainMenus();
+
+        
+        advanced.addSeparator();
+        
+        OpenThermalCamControlGuiAction thermalCamGui = new OpenThermalCamControlGuiAction(this);
+        actions.put(OpenThermalCamControlGuiAction.class, thermalCamGui);
+        advanced.add(thermalCamGui);
+        
     }
 
     protected boolean removeJMenuAction(Class<? extends ConsoleAction> consoleAction) {

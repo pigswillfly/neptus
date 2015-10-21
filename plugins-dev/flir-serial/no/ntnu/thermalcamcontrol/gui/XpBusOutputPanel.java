@@ -50,17 +50,23 @@ class XpBusOutputPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel xpBusOutputLabel = null;
+    private JRadioButton xpBusOutputCMOSRadioButton = null;
+    private JRadioButton xpBusOutputNoneRadioButton = null;
+    private JRadioButton xpBusOutputBT656RadioButton = null;
+    private ButtonGroup xpBusOutputButtonGroup = null;
+    
     protected XpBusOutputPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel xpBusOutputLabel = new JLabel();
-        JRadioButton xpBusOutputCMOSRadioButton = new JRadioButton();
-        JRadioButton xpBusOutputNoneRadioButton = new JRadioButton();
-        JRadioButton xpBusOutputBT656RadioButton = new JRadioButton();
-        ButtonGroup xpBusOutputButtonGroup = new ButtonGroup();
+        xpBusOutputLabel = new JLabel();
+        xpBusOutputCMOSRadioButton = new JRadioButton();
+        xpBusOutputNoneRadioButton = new JRadioButton();
+        xpBusOutputBT656RadioButton = new JRadioButton();
+        xpBusOutputButtonGroup = new ButtonGroup();
         
         xpBusOutputButtonGroup.add(xpBusOutputNoneRadioButton);
         xpBusOutputButtonGroup.add(xpBusOutputBT656RadioButton);
@@ -107,7 +113,10 @@ class XpBusOutputPanel extends JPanel {
                 .addContainerGap())
         );
        
-        xpBusOutputNoneRadioButton.setSelected(true);
+        askForCurrentSetting();
     }
 
+    private void askForCurrentSetting(){
+        xpBusOutputNoneRadioButton.setSelected(true);
+    }
 }

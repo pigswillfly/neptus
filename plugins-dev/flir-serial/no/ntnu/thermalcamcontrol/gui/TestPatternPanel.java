@@ -50,16 +50,21 @@ class TestPatternPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel testPatternLabel = null;
+    private JRadioButton testPatternRampRadioButton = null;
+    private JRadioButton testPatternOffRadioButton = null;
+    private ButtonGroup testPatternButtonGroup = null;
+    
     protected TestPatternPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel testPatternLabel = new JLabel();
-        JRadioButton testPatternRampRadioButton = new JRadioButton();
-        JRadioButton testPatternOffRadioButton = new JRadioButton();
-        ButtonGroup testPatternButtonGroup = new ButtonGroup();
+        testPatternLabel = new JLabel();
+        testPatternRampRadioButton = new JRadioButton();
+        testPatternOffRadioButton = new JRadioButton();
+        testPatternButtonGroup = new ButtonGroup();
         
         testPatternButtonGroup.add(testPatternOffRadioButton);
         testPatternButtonGroup.add(testPatternRampRadioButton);

@@ -48,6 +48,10 @@ class OrientationPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private JCheckBox orientationInvertCheckBox = null;
+    private JCheckBox orientationRevertCheckBox = null;
+    private JLabel orientationLabel = null;
 
     protected OrientationPanel(){
         super();
@@ -55,9 +59,9 @@ class OrientationPanel extends JPanel {
     }
     
     private void initialize(){
-        JCheckBox orientationInvertCheckBox = new JCheckBox();
-        JCheckBox orientationRevertCheckBox = new JCheckBox();
-        JLabel orientationLabel = new JLabel();
+        orientationInvertCheckBox = new JCheckBox();
+        orientationRevertCheckBox = new JCheckBox();
+        orientationLabel = new JLabel();
 
         this.setBorder(BorderFactory.createEtchedBorder());
 

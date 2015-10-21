@@ -49,6 +49,10 @@ class PolarityPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private JLabel polarityLabel = null;
+    private JComboBox<?> polarityComboBox = null;
+    private ArrayList<String> mList = null;
 
     protected PolarityPanel(){
         super();
@@ -56,14 +60,14 @@ class PolarityPanel extends JPanel {
     }
 
     private void initialize(){
-        JLabel polarityLabel = new JLabel();
+        polarityLabel = new JLabel();
 
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        ArrayList<String> mList = new ArrayList<String>(2);
+        mList = new ArrayList<String>(2);
         mList.add("WhiteHot");
         mList.add("BlackHot");
-        JComboBox<?> polarityComboBox = new JComboBox<Object>(mList.toArray(new String[mList.size()]));
+        polarityComboBox = new JComboBox<Object>(mList.toArray(new String[mList.size()]));
 
         polarityLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         polarityLabel.setText("Polarity / Palette");
@@ -88,5 +92,23 @@ class PolarityPanel extends JPanel {
                 .addComponent(polarityComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(25, Short.MAX_VALUE))
         );
+    }
+    
+    private ArrayList<String> getPolarityComboBoxList(){
+        
+        if(mList == null){
+            mList = new ArrayList<String>(2);
+            mList.add("WhiteHot");
+            mList.add("BlackHot");
+        }
+        return mList;
+    }
+    
+    public ArrayList<String> addToPolarityComboBoxList(String item){
+        if(mList == null){
+            getPolarityComboBoxList();
+        }
+        mList.add(item);
+        return mList;        
     }
 }

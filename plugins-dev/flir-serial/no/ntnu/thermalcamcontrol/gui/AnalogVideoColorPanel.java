@@ -50,6 +50,10 @@ class AnalogVideoColorPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JRadioButton analogVideoColorRadioButton = null;
+    private JRadioButton analogVideoMonochromeRadioButton = null;
+    private JLabel analogVideoColorLabel = null;
+    
     protected AnalogVideoColorPanel(){
         super();
         initialize();
@@ -57,9 +61,9 @@ class AnalogVideoColorPanel extends JPanel {
     
     private void initialize(){
 
-        JRadioButton analogVideoColorRadioButton = new JRadioButton();
-        JRadioButton analogVideoMonochromeRadioButton = new JRadioButton();
-        JLabel analogVideoColorLabel = new JLabel();
+        analogVideoColorRadioButton = new JRadioButton();
+        analogVideoMonochromeRadioButton = new JRadioButton();
+        analogVideoColorLabel = new JLabel();
         
         ButtonGroup analogVideoColorButtonGroup = new ButtonGroup();
         analogVideoColorButtonGroup.add(analogVideoColorRadioButton);
@@ -100,7 +104,11 @@ class AnalogVideoColorPanel extends JPanel {
                 .addComponent(analogVideoMonochromeRadioButton)
                 .addContainerGap())
         );
-
+        askForCurrentSetting();
+       
+    }
+    
+    private void askForCurrentSetting(){
         analogVideoMonochromeRadioButton.setSelected(true);
     }
 

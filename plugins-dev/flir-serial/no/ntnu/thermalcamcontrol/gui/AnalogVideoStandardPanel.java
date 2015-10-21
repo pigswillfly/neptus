@@ -49,6 +49,13 @@ class AnalogVideoStandardPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private JLabel videoStandardLabel = null;
+    private JLabel videoStandardNote1Label = null;
+    private JLabel videoStandardNote2Label = null;
+    private JRadioButton videoStandardNTSCRadioButton = null;
+    private JRadioButton videoStandardPALRadioButton = null;
+    private ButtonGroup videoStandardButtonGroup = null;
 
     protected AnalogVideoStandardPanel(){
         super();
@@ -57,12 +64,13 @@ class AnalogVideoStandardPanel extends JPanel {
     
     private void initialize(){
         
-        JLabel videoStandardLabel = new JLabel();
-        JLabel videoStandardNote1Label = new JLabel();
-        JLabel videoStandardNote2Label = new JLabel();
-        JRadioButton videoStandardNTSCRadioButton = new JRadioButton();
-        JRadioButton videoStandardPALRadioButton = new JRadioButton();
-        ButtonGroup videoStandardButtonGroup = new ButtonGroup();
+        videoStandardLabel = new JLabel();
+        videoStandardNote1Label = new JLabel();
+        videoStandardNote2Label = new JLabel();
+        videoStandardNTSCRadioButton = new JRadioButton();
+        videoStandardPALRadioButton = new JRadioButton();
+        videoStandardButtonGroup = new ButtonGroup();
+        
         videoStandardButtonGroup.add(videoStandardNTSCRadioButton);
         videoStandardButtonGroup.add(videoStandardPALRadioButton);
 

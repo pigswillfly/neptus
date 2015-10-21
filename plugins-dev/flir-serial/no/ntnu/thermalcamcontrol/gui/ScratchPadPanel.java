@@ -51,17 +51,23 @@ class ScratchPadPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel scratchPadLabel = null;
+    private JButton scratchPadWriteButton = null;
+    private JButton scratchPadReadButton = null;
+    private JScrollPane scratchPadScrollPane = null;
+    private JTextArea scratchPadText = null;
+    
     protected ScratchPadPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel scratchPadLabel = new JLabel();
-        JButton scratchPadWriteButton = new JButton();
-        JButton scratchPadReadButton = new JButton();
-        JScrollPane scratchPadScrollPane = new JScrollPane();
-        JTextArea scratchPadText = new JTextArea();
+        scratchPadLabel = new JLabel();
+        scratchPadWriteButton = new JButton();
+        scratchPadReadButton = new JButton();
+        scratchPadScrollPane = new JScrollPane();
+        scratchPadText = new JTextArea();
 
         this.setBorder(BorderFactory.createEtchedBorder());
 

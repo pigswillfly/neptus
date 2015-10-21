@@ -35,8 +35,6 @@ import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
@@ -55,6 +53,25 @@ class FfcPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+
+    private JLabel ffcLabel = null;
+    private JRadioButton ffcAuto = null;
+    private JRadioButton ffcManual = null;
+    private JRadioButton ffcExternal = null;
+    private ButtonGroup ffcButtonGroup = null;
+    private JLabel ffcIntervalLabel = null;
+    private JTextField ffcIntervalText = null;
+    private JLabel ffcIntervalUnitLabel = null;
+    private JLabel lowGainFFCIntervalLabel = null;
+    private JTextField lowGainFFCIntervalText = null;
+    private JLabel lowGainFFCIntervalUnitLabel = null;
+    private JLabel tempChangeLabel = null;
+    private JTextField tempChangeText = null;
+    private JLabel tempChangeUnitLabel = null;
+    private JLabel lowGainTempChangeLabel = null;
+    private JTextField lowGainTempChangeText = null;
+    private JLabel lowGainTempChangeUnitLabel = null;
+    private JButton doFFCButton = null;
     private JPanel ssnPanel = null;
     
     protected FfcPanel(){
@@ -63,24 +80,25 @@ class FfcPanel extends JPanel {
     }
     
     private void initialize(){
-        JLabel ffcLabel = new JLabel();
-        JRadioButton ffcAuto = new JRadioButton();
-        JRadioButton ffcManual = new JRadioButton();
-        JRadioButton ffcExternal = new JRadioButton();
-        ButtonGroup ffcButtonGroup = new ButtonGroup();
-        JLabel ffcIntervalLabel = new JLabel();
-        JTextField ffcIntervalText = new JTextField();
-        JLabel ffcIntervalUnitLabel = new JLabel();
-        JLabel lowGainFFCIntervalLabel = new JLabel();
-        JTextField lowGainFFCIntervalText = new JTextField();
-        JLabel lowGainFFCIntervalUnitLabel = new JLabel();
-        JLabel tempChangeLabel = new JLabel();
-        JTextField tempChangeText = new JTextField();
-        JLabel tempChangeUnitLabel = new JLabel();
-        JLabel lowGainTempChangeLabel = new JLabel();
-        JTextField lowGainTempChangeText = new JTextField();
-        JLabel lowGainTempChangeUnitLabel = new JLabel();
-        JButton doFFCButton = new JButton();
+        ffcLabel = new JLabel();
+        ffcAuto = new JRadioButton();
+        ffcManual = new JRadioButton();
+        ffcExternal = new JRadioButton();
+        ffcButtonGroup = new ButtonGroup();
+        ffcIntervalLabel = new JLabel();
+        ffcIntervalText = new JTextField();
+        ffcIntervalUnitLabel = new JLabel();
+        lowGainFFCIntervalLabel = new JLabel();
+        lowGainFFCIntervalText = new JTextField();
+        lowGainFFCIntervalUnitLabel = new JLabel();
+        tempChangeLabel = new JLabel();
+        tempChangeText = new JTextField();
+        tempChangeUnitLabel = new JLabel();
+        lowGainTempChangeLabel = new JLabel();
+        lowGainTempChangeText = new JTextField();
+        lowGainTempChangeUnitLabel = new JLabel();
+        doFFCButton = new JButton();
+        ssnPanel = new SsnPanel();
         
         ffcButtonGroup.add(ffcManual);
         ffcButtonGroup.add(ffcAuto);
@@ -126,7 +144,7 @@ class FfcPanel extends JPanel {
             .addGroup(ffcPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(ffcPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(getSSNPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(ssnPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ffcLabel, GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.LEADING, ffcPanelLayout.createSequentialGroup()
                         .addComponent(ffcManual)
@@ -197,63 +215,11 @@ class FfcPanel extends JPanel {
                 .addGap(18, 18, 18)
                 .addComponent(doFFCButton)
                 .addGap(18, 18, 18)
-                .addComponent(getSSNPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(ssnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32))
         );
 
         ffcManual.setSelected(true);
-    }
-
-    private JPanel getSSNPanel(){
-
-        if(ssnPanel == null){
-            // SSN Panel
-            ssnPanel = new JPanel();
-            JLabel ssnLabel = new JLabel();
-            JCheckBox enableSSNCheckbox = new JCheckBox();
-            JCheckBox withShutterCheckbox = new JCheckBox();
-            JComboBox<?> ssnComboBox = new JComboBox<Object>();
-            
-            ssnPanel.setBorder(BorderFactory.createEtchedBorder());
-    
-            enableSSNCheckbox.setText("Enable SSN");
-    
-            ssnLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
-            ssnLabel.setText("SSN");
-    
-            withShutterCheckbox.setText("With Shutter");
-    
-            GroupLayout ssnPanelLayout = new GroupLayout(ssnPanel);
-            ssnPanel.setLayout(ssnPanelLayout);
-            ssnPanelLayout.setHorizontalGroup(
-                ssnPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(ssnPanelLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addGroup(ssnPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(ssnLabel)
-                        .addComponent(enableSSNCheckbox)
-                        .addGroup(ssnPanelLayout.createSequentialGroup()
-                            .addGap(32, 32, 32)
-                            .addGroup(ssnPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(withShutterCheckbox)
-                                .addComponent(ssnComboBox, GroupLayout.PREFERRED_SIZE, 180, GroupLayout.PREFERRED_SIZE))))
-                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            );
-            ssnPanelLayout.setVerticalGroup(
-                ssnPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                .addGroup(ssnPanelLayout.createSequentialGroup()
-                    .addContainerGap()
-                    .addComponent(ssnLabel)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                    .addComponent(enableSSNCheckbox)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(withShutterCheckbox)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(ssnComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addContainerGap())
-            );
-        }       
-        return ssnPanel;
     }
     
 }

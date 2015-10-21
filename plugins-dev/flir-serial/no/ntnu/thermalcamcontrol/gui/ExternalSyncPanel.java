@@ -49,6 +49,12 @@ class ExternalSyncPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private JLabel externalSyncLabel = null;
+    private JRadioButton externalSyncSlaveRadioButton = null;
+    private JRadioButton externalSyncMasterRadioButton = null;
+    private JRadioButton externalSyncDisableRadioButton = null;
+    private ButtonGroup externalSyncButtonGroup = null;
 
     protected ExternalSyncPanel(){
         super();
@@ -56,11 +62,11 @@ class ExternalSyncPanel extends JPanel {
     }
     
     private void initialize(){
-        JLabel externalSyncLabel = new JLabel();
-        JRadioButton externalSyncSlaveRadioButton = new JRadioButton();
-        JRadioButton externalSyncMasterRadioButton = new JRadioButton();
-        JRadioButton externalSyncDisableRadioButton = new JRadioButton();
-        ButtonGroup externalSyncButtonGroup = new ButtonGroup();
+        externalSyncLabel = new JLabel();
+        externalSyncSlaveRadioButton = new JRadioButton();
+        externalSyncMasterRadioButton = new JRadioButton();
+        externalSyncDisableRadioButton = new JRadioButton();
+        externalSyncButtonGroup = new ButtonGroup();
         
         externalSyncButtonGroup.add(externalSyncDisableRadioButton);
         externalSyncButtonGroup.add(externalSyncSlaveRadioButton);

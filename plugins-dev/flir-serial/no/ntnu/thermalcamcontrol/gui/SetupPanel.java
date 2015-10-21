@@ -32,6 +32,7 @@
 package no.ntnu.thermalcamcontrol.gui;
 
 import javax.swing.JPanel;
+
 import javax.swing.GroupLayout;
 
 /**

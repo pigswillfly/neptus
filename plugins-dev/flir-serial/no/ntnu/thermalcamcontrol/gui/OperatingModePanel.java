@@ -50,16 +50,21 @@ class OperatingModePanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel operatingModeLabel = null;
+    private JRadioButton operatingModeRealTimeRadioButton = null;
+    private JRadioButton operatingModeFrozenRadioButton = null;
+    private ButtonGroup operatingModeButtonGroup = null;
+    
     protected OperatingModePanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JLabel operatingModeLabel = new JLabel();
-        JRadioButton operatingModeRealTimeRadioButton = new JRadioButton();
-        JRadioButton operatingModeFrozenRadioButton = new JRadioButton();
-        ButtonGroup operatingModeButtonGroup = new ButtonGroup();
+        operatingModeLabel = new JLabel();
+        operatingModeRealTimeRadioButton = new JRadioButton();
+        operatingModeFrozenRadioButton = new JRadioButton();
+        operatingModeButtonGroup = new ButtonGroup();
         
         operatingModeButtonGroup.add(operatingModeFrozenRadioButton);
         operatingModeButtonGroup.add(operatingModeRealTimeRadioButton);

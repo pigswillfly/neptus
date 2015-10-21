@@ -53,11 +53,32 @@ class PanZoomPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+
+    private JLabel panZoomLabel = null;
+    private JRadioButton unzoomRadioButton = null;
+    private JRadioButton zoom2xRadioButton = null;
+    private JRadioButton zoom4xRadioButton = null;
+    private JRadioButton zoom8xRadioButton = null;
+    private ButtonGroup zoomButtonGroup = null;
+    private JTextField eZoomText = null;
+    private JLabel eZoomValueLabel = null;
     
     private JPanel eZoomSliderPanel = null;
-    private JPanel panSliderPanel = null;
-    private JPanel panPanel = null;
+    private JLabel eightXLabel = null;
+    private JLabel eZoomLabel = null;
+    private JLabel oneXLabel = null;
+    private JSlider eZoomSlider = null;
+    
+    private JPanel panSliderPanel = null;    
+    private JSlider horizontalPanSlider = null;
+    private JSlider verticalPanSlider = null;    
 
+    private JPanel panPanel = null;
+    private JLabel panLabel = null;
+    private JButton panCenterButton = null;
+    private JCheckBox panFineCheckBox = null;
+    private JTextField panText = null;
+    
     /**
      * 
      */
@@ -67,14 +88,15 @@ class PanZoomPanel extends JPanel {
     }
     
     private void initialize(){
-        JLabel panZoomLabel = new JLabel();
-        JRadioButton unzoomRadioButton = new JRadioButton();
-        JRadioButton zoom2xRadioButton = new JRadioButton();
-        JRadioButton zoom4xRadioButton = new JRadioButton();
-        JRadioButton zoom8xRadioButton = new JRadioButton();
-        ButtonGroup zoomButtonGroup = new ButtonGroup();
-        JTextField eZoomText = new JTextField();
-        JLabel eZoomValueLabel = new JLabel();
+        panZoomLabel = new JLabel();
+        unzoomRadioButton = new JRadioButton();
+        zoom2xRadioButton = new JRadioButton();
+        zoom4xRadioButton = new JRadioButton();
+        zoom8xRadioButton = new JRadioButton();
+        zoomButtonGroup = new ButtonGroup();
+        eZoomText = new JTextField();
+        eZoomValueLabel = new JLabel();
+        
         zoomButtonGroup.add(unzoomRadioButton);
         zoomButtonGroup.add(zoom2xRadioButton);
         zoomButtonGroup.add(zoom4xRadioButton);
@@ -150,8 +172,8 @@ class PanZoomPanel extends JPanel {
         if(panSliderPanel == null){
             
             panSliderPanel = new JPanel();
-            JSlider horizontalPanSlider = new JSlider();
-            JSlider verticalPanSlider = new JSlider();        
+            horizontalPanSlider = new JSlider();
+            verticalPanSlider = new JSlider();        
 
             horizontalPanSlider.setMajorTickSpacing(5);
             horizontalPanSlider.setMaximum(40);
@@ -203,10 +225,10 @@ class PanZoomPanel extends JPanel {
         if(eZoomSliderPanel == null){
             
             eZoomSliderPanel = new JPanel();
-            JLabel eightXLabel = new JLabel();
-            JLabel eZoomLabel = new JLabel();
-            JLabel oneXLabel = new JLabel();
-            JSlider eZoomSlider = new JSlider();
+            eightXLabel = new JLabel();
+            eZoomLabel = new JLabel();
+            oneXLabel = new JLabel();
+            eZoomSlider = new JSlider();
 
             eightXLabel.setText("8x");
             eZoomLabel.setText("EZoom");
@@ -258,10 +280,10 @@ class PanZoomPanel extends JPanel {
         if(panPanel == null){
             
             panPanel = new JPanel();
-            JLabel panLabel = new JLabel();
-            JButton panCenterButton = new JButton();
-            JCheckBox panFineCheckBox = new JCheckBox();
-            JTextField panText = new JTextField();
+            panLabel = new JLabel();
+            panCenterButton = new JButton();
+            panFineCheckBox = new JCheckBox();
+            panText = new JTextField();
 
             panLabel.setText("Pan:");
     

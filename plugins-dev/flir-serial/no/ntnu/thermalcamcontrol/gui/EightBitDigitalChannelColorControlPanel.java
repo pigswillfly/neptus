@@ -51,9 +51,28 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JLabel eightBitDigitalChannelColorControlLabel = null;
+    private JCheckBox colorizationEnableCheckBox = null;
+    
     private JPanel bayerOrderPanel = null;
+    private JLabel bayerOrderLabel = null;
+    private JRadioButton bayerOrderGBFilterRadioButton = null;
+    private JRadioButton bayerOrderGRFilterRadioButton = null;
+    private JRadioButton bayerOrderRGFilterRadioButton = null;
+    private JRadioButton bayerOrderBGFilterRadioButton = null;
+    private ButtonGroup bayerOrderButtonGroup = null;
+    
     private JPanel ySubSamplingPanel = null;
+    private JLabel ySubSamplingLabel = null;
+    private JRadioButton ySubSamplingCenterRadioButton = null;
+    private JRadioButton ySubSamplingPositedRadioButton = null;
+    private ButtonGroup ySubSamplingButtonGroup = null;
+    
     private JPanel yOrderPanel = null;
+    private JLabel yOrderLabel = null;
+    private JRadioButton cFirstRadioButton = null;
+    private JRadioButton yFirstRadioButton = null;
+    private ButtonGroup yOrderButtonGroup = null;
     
     protected EightBitDigitalChannelColorControlPanel(){
         super();
@@ -61,8 +80,8 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
     }
     
     private void initialize(){
-        JLabel eightBitDigitalChannelColorControlLabel = new JLabel();
-        JCheckBox colorizationEnableCheckBox = new JCheckBox();
+        eightBitDigitalChannelColorControlLabel = new JLabel();
+        colorizationEnableCheckBox = new JCheckBox();
         
         this.setBorder(BorderFactory.createEtchedBorder());
 
@@ -112,12 +131,12 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
         if(bayerOrderPanel == null){
             
             bayerOrderPanel = new JPanel();
-            JRadioButton bayerOrderGBFilterRadioButton = new JRadioButton();
-            JRadioButton bayerOrderGRFilterRadioButton = new JRadioButton();
-            JRadioButton bayerOrderRGFilterRadioButton = new JRadioButton();
-            JLabel bayerOrderLabel = new JLabel();
-            JRadioButton bayerOrderBGFilterRadioButton = new JRadioButton();
-            ButtonGroup bayerOrderButtonGroup = new ButtonGroup();
+            bayerOrderLabel = new JLabel();
+            bayerOrderGBFilterRadioButton = new JRadioButton();
+            bayerOrderGRFilterRadioButton = new JRadioButton();
+            bayerOrderRGFilterRadioButton = new JRadioButton();
+            bayerOrderBGFilterRadioButton = new JRadioButton();
+            bayerOrderButtonGroup = new ButtonGroup();
             
             bayerOrderButtonGroup.add(bayerOrderGBFilterRadioButton);
             bayerOrderButtonGroup.add(bayerOrderGRFilterRadioButton);
@@ -180,10 +199,10 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
         if(ySubSamplingPanel == null){
         
             ySubSamplingPanel = new JPanel();
-            JLabel ySubSamplingLabel = new JLabel();
-            JRadioButton ySubSamplingCenterRadioButton = new JRadioButton();
-            JRadioButton ySubSamplingPositedRadioButton = new JRadioButton();
-            ButtonGroup ySubSamplingButtonGroup = new ButtonGroup();
+            ySubSamplingLabel = new JLabel();
+            ySubSamplingCenterRadioButton = new JRadioButton();
+            ySubSamplingPositedRadioButton = new JRadioButton();
+            ySubSamplingButtonGroup = new ButtonGroup();
             
             ySubSamplingButtonGroup.add(ySubSamplingCenterRadioButton);
             ySubSamplingButtonGroup.add(ySubSamplingPositedRadioButton);
@@ -233,10 +252,10 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
         if(yOrderPanel == null){
             
             yOrderPanel = new JPanel();
-            JLabel yOrderLabel = new JLabel();
-            JRadioButton cFirstRadioButton = new JRadioButton();
-            JRadioButton yFirstRadioButton = new JRadioButton();
-            ButtonGroup yOrderButtonGroup = new ButtonGroup();
+            yOrderLabel = new JLabel();
+            cFirstRadioButton = new JRadioButton();
+            yFirstRadioButton = new JRadioButton();
+            yOrderButtonGroup = new ButtonGroup();
             
             yOrderButtonGroup.add(cFirstRadioButton);
             yOrderButtonGroup.add(yFirstRadioButton);

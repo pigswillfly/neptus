@@ -50,16 +50,22 @@ class AnalogVideoOnOffPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
+    private JRadioButton analogVideoOnRadioButton = null;
+    private JRadioButton analogVideoOffRadioButton = null;
+    private JLabel analogVideoOnOffLabel = null;
+    private ButtonGroup analogVideoOnOffButtonGroup = null;
+    
     protected AnalogVideoOnOffPanel(){
         super();
         initialize();
     }
     
     private void initialize(){
-        JRadioButton analogVideoOnRadioButton = new JRadioButton();
-        JRadioButton analogVideoOffRadioButton = new JRadioButton();
-        JLabel analogVideoOnOffLabel = new JLabel();
-        ButtonGroup analogVideoOnOffButtonGroup = new ButtonGroup();
+        analogVideoOnRadioButton = new JRadioButton();
+        analogVideoOffRadioButton = new JRadioButton();
+        analogVideoOnOffLabel = new JLabel();
+        analogVideoOnOffButtonGroup = new ButtonGroup();
+        
         analogVideoOnOffButtonGroup.add(analogVideoOnRadioButton);
         analogVideoOnOffButtonGroup.add(analogVideoOffRadioButton);
         
@@ -99,7 +105,12 @@ class AnalogVideoOnOffPanel extends JPanel {
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        analogVideoOnRadioButton.setSelected(true);
+        askForCurrentSetting();
     }
 
+    private void askForCurrentSetting(){
+        // send message to find out current setting
+        analogVideoOnRadioButton.setSelected(true);
+    }
+    
 }

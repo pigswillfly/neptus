@@ -45,6 +45,10 @@ class SettingsButtonsPanel extends JPanel {
      * 
      */
     private static final long serialVersionUID = 1L;
+
+    private JButton factoryDefaultsButton = null;
+    private JButton resetCameraButton = null;
+    private JButton saveSettingsButton = null;
     
     protected SettingsButtonsPanel(){
         super();
@@ -52,9 +56,9 @@ class SettingsButtonsPanel extends JPanel {
     }
     
     private void initialize(){
-        JButton factoryDefaultsButton = new JButton();
-        JButton resetCameraButton = new JButton();
-        JButton saveSettingsButton = new JButton();
+        factoryDefaultsButton = new JButton();
+        resetCameraButton = new JButton();
+        saveSettingsButton = new JButton();
 
         factoryDefaultsButton.setText("Factory Defaults");
         resetCameraButton.setText("Reset Camera");
