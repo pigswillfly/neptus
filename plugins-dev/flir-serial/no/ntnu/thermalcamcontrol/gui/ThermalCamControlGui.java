@@ -119,8 +119,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         this.setLayout(new BorderLayout());
         this.add(contentPanel, BorderLayout.CENTER);
         
-        //connectionStatusUpdater = new PeriodicThermalCamConnectedQuery();
-        //connectionStatusUpdater.startWorking();
+        sendConnectRequest();
         
     }
     
@@ -234,7 +233,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             connectedLabel.setText("Connecting...");
         }
         ThermalCamControl msg = new ThermalCamControl();
-        msg.setProcessCode((short)0x6E);
+        msg.setProcessCode(ThermalCamFunctionCodes.NO_OP.getFunctionCode());
         send(msg);  
     }
     

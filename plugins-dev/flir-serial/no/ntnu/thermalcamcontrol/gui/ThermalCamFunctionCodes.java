@@ -145,26 +145,58 @@ enum ThermalCamFunctionCodes {
     READ_ARRAY_AVERAGE(0x68, 0, 4, "Read the mean of the current frame. Not ROI dependent"),
     MAX_AGC_GAIN_GET(0x6A, 0, 2, "Get the max-gain parameter for plateau AGC"),
     MAX_AGC_GAIN_SET(0x6A, 2, 2, "Set the max-gain patameter for plataeu AGC"),
+    PAN_AND_TILT_GET(0x70, 0, 4, "Get the pan (x axis) and tilt (y axis) for the zoom window "
+            + "relative to the center of the unzoomed window. Bytes 0-1: Tilt pos, 2-3: Pan pos in rows"),
+    PAN_AND_TILT_SET(0x70, 4, 4, "Set the pan (x axis) and tilt (y axis) for the zoom window "
+            + "relative to the center of the unzoomed window. Bytes 0-1: Tilt pos, 2-3: Pan pos in rows"),
+    VIDEO_STANDARD_GET(0x72, 0, 2, "Get the video standard"),
+    VIDOE_STANDARD_SET(0x72, 2, 2, "Set the video standard"),
+    SHUTTER_POSITION_GET(0x79, 0, 2, "Get the shutter position. Non-blocking"),
+    SHUTTER_POSITION_SET(0x79, 2, 2, "Set the shutter position. Non-blocking"),
+    SHUTTER_PROFILE_GET(0x80, 0, 34, "Get the shutter profile (safety timeout + close/open table"),
+    SHUTTER_PROFILE_SET(0x80, 34, 34, "Set the shutter profile (safety timeout + close/open table"),
+    TRANSFER_FRAME(0x82, 4, 4, "Capture a snapshot to a specified buffer location. Non-blocking"),
+    TLIN_COMMANDS_RESOLUTION_GET(0x8E, 2, 2, "Get the resolution of the TLinear digital video"),
+    TLIN_COMMANDS_RESOLUTION_SET(0x8E, 4, 0, "Set the resoluation of the TLinear digital video"),
+    TLIN_COMMANDS_OUTPUT_GET(0x8E, 2, 2, "Get TLinear output enabled status"),
+    TLIN_COMMANDS_OUTPUT_SET(0x8E, 4, 0, "Enable/disable TLinear output"),
+    CORRECTION_MASK_GET(0xB1, 0, 2, "Get the corrections applied"),
+    CORRECTION_MASK_SET(0xB1, 2, 2, "Set the corrections applied"),
+    MEMORY_STATUS(0xC4, 0, 2, "Get the status for several non-blocking write/erase commands"),
+    WRITE_NVFFC_TABLE(0xC6, 0, 0, "Write the FFC map to nonvolatile memory"),
+    READ_MEMORY(0xD2, 6, 256, "Reads specified number of bytes beginning at specified address. "
+            + "Bytes 0-3: address, 4-6: number of bytes to read"),
+    ERASE_MEMORY_BLOCK(0xD4, 2, 2, "Erases a block or a range of non-volatile memory"),
+    GET_NV_MEMORY_SIZE(0xD5, 2, 8, "Get the base address and block size of the non-volatile memory device. "
+            + "Reply bytes 0-3: base address, 4-7: block size in bytes"),
+    GET_MEMORY_ADDRESS(0xD6, 4, 8, "Get the memory address and size of the specified buffer"),
+    GAIN_SWITCH_PARAMS_GET(0xDB, 0, 8, "Get the population (%) and temp (degC) thresholds for automatic high/low gain-state switching"),
+    GAIN_SWITCH_PARAMS_SET(0xDB, 8, 8, "Set the population (%) and temp (degC) thresholds for automatic high/low gain-state switching"),
+    DDE_THRESHOLD_GET(0xE2, 0, 2, "Get the threshold of the DDE filter"),
+    DDE_THRESHOLD_SET(0xE2, 2, 2, "Set the threshold of the DDE filter"),
+    SPATIAL_THRESHOLD_GET(0xE3, 0, 2, "Get the spatial threshold of the DDE filter and the DDE mode"),
+    SPATIAL_THRESHOLD_SET(0xE3, 2, 2, "Set the spatial threshold of the DDE filter and the DDE mode"),
+    LENS_RESPONSE_PARAMS_GET(0xE5, 2, 4, "Get the lens parameters for the calculated responsitivity"),
+    LENS_RESPONSE_PARAMS_SET(0xE5, 6, 0, "Get the lens parameters for the calculated responsitivity"),
+    LENS_RESPONSE_PARAMS_RADIOMETRY_GET(0xE5, 2, 2, "Get the scene parameters for radiometric calculations"),
+    LENS_RESPONSE_PARAMS_RADIOMETRY_SET(0xE5, 4, 0, "Set the scene parameters for radiometric calculations")
     ;
     
-    
-    
-    
-    private int hexCode;
+    private int functionCode;
     private int cmdByteCount;
     private int replyByteCount;
     private String description;
     
     
     ThermalCamFunctionCodes(int code, int cSize, int rSize, String desc){
-        this.hexCode = code;
+        this.functionCode = code;
         this.cmdByteCount = cSize;
         this.replyByteCount = rSize;
         this.description = desc;
     }
     
-    public int getNumVal(){
-        return hexCode;
+    public short getFunctionCode(){
+        return (short)functionCode;
     }
     
     public int getCmdByteCount(){
