@@ -245,7 +245,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     
     public JPanel getStatusPanel(){
         if(statusPanel == null){
-            statusPanel = new JPanel();
+            statusPanel = new StatusPanel();
         }
         return statusPanel;
     }
@@ -323,7 +323,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             serialNumberLabel = new JLabel();
             statusLabel = new JLabel();
             
-            bottomPanel.setPreferredSize(new java.awt.Dimension(866, 60));
+            bottomPanel.setPreferredSize(new java.awt.Dimension(866, 64));
             connectedLabel.setIcon(RED_LIGHT);
             connectedLabel.setText("Not connected");
             partNumberLabel.setText("Part #:");
@@ -403,8 +403,5 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         // TODO Auto-generated method stub
         
     }
-
-   
-
     
 }
