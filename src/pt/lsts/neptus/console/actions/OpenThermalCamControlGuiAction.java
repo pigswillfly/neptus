@@ -79,7 +79,7 @@ public class OpenThermalCamControlGuiAction extends ConsoleAction {
                     super.windowClosing(e);
                 }
             });
-            thermalCamControlFrame.setSize(875,750);
+            thermalCamControlFrame.setSize(900,750);
             thermalCamControlFrame.setLocation(500,100);
             thermalCamControlFrame.setResizable(true);
             thermalCamControlFrame.add(thermalCamGuiMainPanel);

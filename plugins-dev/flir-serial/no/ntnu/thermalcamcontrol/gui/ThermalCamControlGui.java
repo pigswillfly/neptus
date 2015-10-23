@@ -85,10 +85,10 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
       
     private JTabbedPane tabPanel = null;
     private JPanel statusPanel = null;
-    private SetupPanel setupPanel = null;
+    private JPanel setupPanel = null;
     private JTabbedPane videoPanel = null;
-    private AnalogPanel analogPanel = null;
-    private DigitalPanel digitalPanel = null;
+    private JPanel analogPanel = null;
+    private JPanel digitalPanel = null;
     private JPanel agcPanel = null;
     private JPanel thermalPanel = null;
     
@@ -250,7 +250,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return statusPanel;
     }
     
-    public SetupPanel getSetupPanel(){
+    public JPanel getSetupPanel(){
         if(setupPanel == null){
             setupPanel = new SetupPanel();
         }
@@ -266,14 +266,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return videoPanel;
     }
     
-    public AnalogPanel getAnalogPanel(){
+    public JPanel getAnalogPanel(){
         if(analogPanel == null){
             analogPanel = new AnalogPanel();
         }
         return analogPanel;
     }
     
-    public DigitalPanel getDigitalPanel(){
+    public JPanel getDigitalPanel(){
         if(digitalPanel == null){
             digitalPanel = new DigitalPanel();
         }
@@ -282,7 +282,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
 
     public JPanel getAgcPanel(){
         if(agcPanel == null){
-            agcPanel = new JPanel();
+            agcPanel = new AGCDDEPanel();
         }
         return agcPanel;
     }

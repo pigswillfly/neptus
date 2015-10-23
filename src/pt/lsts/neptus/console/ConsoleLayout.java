@@ -504,6 +504,14 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
         actions.put(RunChecklistConsoleAction.class, runChecklist);
         tools.add(runChecklist);
         
+        
+        tools.addSeparator();
+        
+        OpenThermalCamControlGuiAction thermalCamGui = new OpenThermalCamControlGuiAction(this);
+        actions.put(OpenThermalCamControlGuiAction.class, thermalCamGui);
+        tools.add(thermalCamGui);
+        
+        
         menuBar.add(tools);
 
         /*
@@ -543,14 +551,6 @@ public class ConsoleLayout extends JFrame implements XmlInOutMethods, ComponentL
         includeHelpMenu();
 
         includeExtraMainMenus();
-
-        
-        advanced.addSeparator();
-        
-        OpenThermalCamControlGuiAction thermalCamGui = new OpenThermalCamControlGuiAction(this);
-        actions.put(OpenThermalCamControlGuiAction.class, thermalCamGui);
-        advanced.add(thermalCamGui);
-        
     }
 
     protected boolean removeJMenuAction(Class<? extends ConsoleAction> consoleAction) {
