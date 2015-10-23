@@ -112,6 +112,9 @@ class PanZoomPanel extends JPanel {
         panZoomLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         panZoomLabel.setText("Pan & Zoom");
         
+        eZoomValueLabel.setText("EZoom Value (1x - 8x)");
+        eZoomText.setText("1.00");        
+        
         GroupLayout panZoomPanelLayout = new GroupLayout(this);
         this.setLayout(panZoomPanelLayout);
         panZoomPanelLayout.setHorizontalGroup(
@@ -136,7 +139,7 @@ class PanZoomPanel extends JPanel {
                             .addGroup(panZoomPanelLayout.createSequentialGroup()
                                 .addComponent(eZoomValueLabel)
                                 .addGap(18, 18, 18)
-                                .addComponent(eZoomText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))))
+                                .addComponent(eZoomText, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)))))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         panZoomPanelLayout.setVerticalGroup(
