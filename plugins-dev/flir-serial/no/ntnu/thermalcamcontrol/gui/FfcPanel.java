@@ -42,11 +42,14 @@ import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class FfcPanel extends JPanel {
+class FfcPanel extends JPanel implements ReplyAction{
 
     /**
      * 
@@ -220,6 +223,24 @@ class FfcPanel extends JPanel {
         );
 
         ffcManual.setSelected(true);
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        // TODO Auto-generated method stub
+        
     }
     
 }

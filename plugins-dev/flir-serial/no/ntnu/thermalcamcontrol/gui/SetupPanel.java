@@ -102,42 +102,42 @@ class SetupPanel extends JPanel {
         );    
     }
 
-    private JPanel getFFCPanel(){
+    protected JPanel getFFCPanel(){
         
         if(ffcPanel == null)
             ffcPanel = new FfcPanel();
         return ffcPanel;
     }
     
-    private JPanel getOperatingModePanel(){
+    protected JPanel getOperatingModePanel(){
         
         if(operatingModePanel == null)
             operatingModePanel = new OperatingModePanel();
         return operatingModePanel;
     }
     
-    private JPanel getTestPatternPanel(){
+    protected JPanel getTestPatternPanel(){
         
         if(testPatternPanel == null)
             testPatternPanel = new TestPatternPanel();
         return testPatternPanel;
     }
     
-    private JPanel getExternalSyncPanel(){
+    protected JPanel getExternalSyncPanel(){
         
         if(externalSyncPanel == null)
             externalSyncPanel = new ExternalSyncPanel();
         return externalSyncPanel;
     }
     
-    private JPanel getGainModePanel(){
+    protected JPanel getGainModePanel(){
         
         if(gainModePanel == null)
             gainModePanel = new GainModePanel();
         return gainModePanel;
     }
     
-    private JPanel getScratchPadPanel(){
+    protected JPanel getScratchPadPanel(){
         
         if(scratchPadPanel == null)
             scratchPadPanel = new ScratchPadPanel();
@@ -145,7 +145,7 @@ class SetupPanel extends JPanel {
         
     }
     
-    private JPanel getSettingsButtonsPanel(){
+    protected JPanel getSettingsButtonsPanel(){
         
         if(settingsButtonsPanel == null)
             settingsButtonsPanel = new SettingsButtonsPanel();

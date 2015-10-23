@@ -39,11 +39,14 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class SsnPanel extends JPanel {
+class SsnPanel extends JPanel implements ReplyAction{
 
     /**
      * 
@@ -106,6 +109,24 @@ class SsnPanel extends JPanel {
                     .addComponent(ssnComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addContainerGap())
             );     
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        // TODO Auto-generated method stub
+        
     }
 
 }
