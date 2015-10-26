@@ -33,26 +33,31 @@ package no.ntnu.thermalcamcontrol.gui;
 
 import javax.swing.JPanel;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 import javax.swing.GroupLayout;
 
 /**
  * @author liz
  *
  */
-class SetupPanel extends JPanel {
+class SetupPanel extends JPanel implements ReplyAction{
 
     private static final long serialVersionUID = 1L;
+        
+    private ThermalCamControlGui gui = null;
+    private FfcPanel ffcPanel = null;
+    private OperatingModePanel operatingModePanel = null;
+    private TestPatternPanel testPatternPanel = null;
+    private ExternalSyncPanel externalSyncPanel = null;
+    private GainModePanel gainModePanel = null;
+    private ScratchPadPanel scratchPadPanel = null;
+    private SettingsButtonsPanel settingsButtonsPanel = null;
     
-    private JPanel ffcPanel = null;
-    private JPanel operatingModePanel = null;
-    private JPanel testPatternPanel = null;
-    private JPanel externalSyncPanel = null;
-    private JPanel gainModePanel = null;
-    private JPanel scratchPadPanel = null;
-    private JPanel settingsButtonsPanel = null;
-    
-    public SetupPanel() {
+    public SetupPanel(ThermalCamControlGui gui) {
         super();
+        this.gui = gui;
         initialize();
     }
                         
@@ -102,42 +107,42 @@ class SetupPanel extends JPanel {
         );    
     }
 
-    protected JPanel getFFCPanel(){
+    protected FfcPanel getFFCPanel(){
         
         if(ffcPanel == null)
-            ffcPanel = new FfcPanel();
+            ffcPanel = new FfcPanel(this.gui);
         return ffcPanel;
     }
     
-    protected JPanel getOperatingModePanel(){
+    protected OperatingModePanel getOperatingModePanel(){
         
         if(operatingModePanel == null)
             operatingModePanel = new OperatingModePanel();
         return operatingModePanel;
     }
     
-    protected JPanel getTestPatternPanel(){
+    protected TestPatternPanel getTestPatternPanel(){
         
         if(testPatternPanel == null)
             testPatternPanel = new TestPatternPanel();
         return testPatternPanel;
     }
     
-    protected JPanel getExternalSyncPanel(){
+    protected ExternalSyncPanel getExternalSyncPanel(){
         
         if(externalSyncPanel == null)
             externalSyncPanel = new ExternalSyncPanel();
         return externalSyncPanel;
     }
     
-    protected JPanel getGainModePanel(){
+    protected GainModePanel getGainModePanel(){
         
         if(gainModePanel == null)
-            gainModePanel = new GainModePanel();
+            gainModePanel = new GainModePanel(this.gui);
         return gainModePanel;
     }
     
-    protected JPanel getScratchPadPanel(){
+    protected ScratchPadPanel getScratchPadPanel(){
         
         if(scratchPadPanel == null)
             scratchPadPanel = new ScratchPadPanel();
@@ -145,11 +150,29 @@ class SetupPanel extends JPanel {
         
     }
     
-    protected JPanel getSettingsButtonsPanel(){
+    public SettingsButtonsPanel getSettingsButtonsPanel(){
         
         if(settingsButtonsPanel == null)
             settingsButtonsPanel = new SettingsButtonsPanel();
         return settingsButtonsPanel;
+        
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        // TODO Auto-generated method stub
         
     }
                  

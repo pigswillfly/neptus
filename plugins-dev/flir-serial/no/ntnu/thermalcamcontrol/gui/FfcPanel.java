@@ -56,11 +56,12 @@ class FfcPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
-
+    private ThermalCamControlGui gui = null;
+    
     private JLabel ffcLabel = null;
-    private JRadioButton ffcAuto = null;
-    private JRadioButton ffcManual = null;
-    private JRadioButton ffcExternal = null;
+    private JRadioButton ffcAutoRadioButton = null;
+    private JRadioButton ffcManualRadioButton = null;
+    private JRadioButton ffcExternalRadioButton = null;
     private ButtonGroup ffcButtonGroup = null;
     private JLabel ffcIntervalLabel = null;
     private JTextField ffcIntervalText = null;
@@ -77,16 +78,17 @@ class FfcPanel extends JPanel implements ReplyAction{
     private JButton doFFCButton = null;
     private JPanel ssnPanel = null;
     
-    protected FfcPanel(){
+    protected FfcPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
     private void initialize(){
         ffcLabel = new JLabel();
-        ffcAuto = new JRadioButton();
-        ffcManual = new JRadioButton();
-        ffcExternal = new JRadioButton();
+        ffcAutoRadioButton = new JRadioButton();
+        ffcManualRadioButton = new JRadioButton();
+        ffcExternalRadioButton = new JRadioButton();
         ffcButtonGroup = new ButtonGroup();
         ffcIntervalLabel = new JLabel();
         ffcIntervalText = new JTextField();
@@ -103,13 +105,13 @@ class FfcPanel extends JPanel implements ReplyAction{
         doFFCButton = new JButton();
         ssnPanel = new SsnPanel();
         
-        ffcButtonGroup.add(ffcManual);
-        ffcButtonGroup.add(ffcAuto);
-        ffcButtonGroup.add(ffcExternal);
+        ffcButtonGroup.add(ffcManualRadioButton);
+        ffcButtonGroup.add(ffcAutoRadioButton);
+        ffcButtonGroup.add(ffcExternalRadioButton);
         
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        ffcAuto.setText("Auto");
+        ffcAutoRadioButton.setText("Auto");
 
         tempChangeUnitLabel.setText("0.1 °C");
 
@@ -119,7 +121,7 @@ class FfcPanel extends JPanel implements ReplyAction{
         lowGainTempChangeLabel.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
         lowGainTempChangeLabel.setText("Low Gain Temp Change");
 
-        ffcManual.setText("Manual");
+        ffcManualRadioButton.setText("Manual");
 
         doFFCButton.setText("Do FFC");
 
@@ -138,7 +140,7 @@ class FfcPanel extends JPanel implements ReplyAction{
 
         lowGainTempChangeUnitLabel.setText("0.1 °C");
 
-        ffcExternal.setText("External");
+        ffcExternalRadioButton.setText("External");
 
         GroupLayout ffcPanelLayout = new GroupLayout(this);
         this.setLayout(ffcPanelLayout);
@@ -150,11 +152,11 @@ class FfcPanel extends JPanel implements ReplyAction{
                     .addComponent(ssnPanel, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(ffcLabel, GroupLayout.Alignment.LEADING)
                     .addGroup(GroupLayout.Alignment.LEADING, ffcPanelLayout.createSequentialGroup()
-                        .addComponent(ffcManual)
+                        .addComponent(ffcManualRadioButton)
                         .addGap(18, 18, 18)
-                        .addComponent(ffcAuto)
+                        .addComponent(ffcAutoRadioButton)
                         .addGap(18, 18, 18)
-                        .addComponent(ffcExternal))
+                        .addComponent(ffcExternalRadioButton))
                     .addComponent(doFFCButton)
                     .addGroup(ffcPanelLayout.createSequentialGroup()
                         .addGroup(ffcPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -192,9 +194,9 @@ class FfcPanel extends JPanel implements ReplyAction{
                 .addComponent(ffcLabel)
                 .addGap(18, 18, 18)
                 .addGroup(ffcPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                    .addComponent(ffcManual)
-                    .addComponent(ffcAuto)
-                    .addComponent(ffcExternal))
+                    .addComponent(ffcManualRadioButton)
+                    .addComponent(ffcAutoRadioButton)
+                    .addComponent(ffcExternalRadioButton))
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
                 .addGroup(ffcPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(ffcIntervalText, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -221,8 +223,12 @@ class FfcPanel extends JPanel implements ReplyAction{
                 .addComponent(ssnPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32))
         );
+    }
+    
+    protected void askForSettings(){
+        ThermalCamControl modeMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_MODE_SELECT_GET);
+        gui.sendCommand(modeMsg);
 
-        ffcManual.setSelected(true);
     }
 
     /* (non-Javadoc)
@@ -230,7 +236,65 @@ class FfcPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
+        
+        if(rec.getFunction() == ThermalCamFunctionCodes.FFC_MODE_SELECT_GET.getFunctionCode()){
+            if(sent.getByteCount() < ThermalCamFunctionCodes.FFC_INTEG_FRAMES_GET.getCmdByteCount()){
+                if((sent.equals(rec)) || (sent.getByteCount() == 0)){
+                    long setting = rec.getArgs()[1];
+                    if(setting == ThermalCamArguments.FFC_MODE_AUTO.getArg()){
+                        ffcAutoRadioButton.setSelected(true);
+                    } else if (setting == ThermalCamArguments.FFC_MODE_MANUAL.getArg()){
+                        ffcManualRadioButton.setSelected(true);
+                    } else if (setting == ThermalCamArguments.FFC_MODE_EXTERNAL.getArg()){
+                        ffcExternalRadioButton.setSelected(true);
+                    } else {
+                        //unknown mode
+                    }
+                } else {
+                    //reply has different setting to command
+                }
+            } else if (sent.getByteCount() == ThermalCamFunctionCodes.FFC_INTEG_FRAMES_GET.getCmdByteCount()){
+                int setOrGet = sent.getArgs()[1];
+                if(setOrGet == ThermalCamArguments.FFC_INTEG_FRAMES_SET.getArg()){
+                    if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_INTEG_FRAMES_SET.getCmdByteCount()){
+                        // all is well, setting took
+                    }
+                } else if (setOrGet == ThermalCamArguments.FFC_INTEG_FRAMES_GET.getArg()){
+                    int mode = rec.getArgs()[1];
+                    if(mode == ThermalCamArguments.FFC_INTEG_FRAMES_4.getArg()){
+                        
+                    } else if (mode == ThermalCamArguments.FFC_INTEG_FRAMES_8.getArg()){
+                        
+                    } else if (mode == ThermalCamArguments.FFC_INTEG_FRAMES_16.getArg()){
+                        
+                    }
+                }
+            }
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.DO_FFC_AUTO.getFunctionCode()){
+            // check status
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getFunctionCode()){
+            if((sent.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getCmdByteCount()) 
+            && (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getReplyByteCount())){
+                long gainMode = gui.getSetupPanel().getGainModePanel().getGainMode();
+                long ffcPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                if(gainMode == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
+                    lowGainFFCIntervalText.setText(String.valueOf(ffcPeriod));    
+                } else if (gainMode == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
+                    ffcIntervalText.setText(String.valueOf(ffcPeriod));
+                } else {
+                    // Don't know gain mode
+                }
+            } else if ((sent.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getCmdByteCount()) 
+                    && (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getReplyByteCount())){
+                long lowGainPeriod, highGainPeriod;
+                lowGainPeriod = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
+                highGainPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                lowGainFFCIntervalText.setText(String.valueOf(lowGainPeriod));
+                ffcIntervalText.setText(String.valueOf(highGainPeriod));
+            }
+
+        }
+        
         
     }
 

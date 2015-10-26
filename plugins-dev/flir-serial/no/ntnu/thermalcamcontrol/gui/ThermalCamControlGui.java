@@ -36,7 +36,6 @@ import java.awt.BorderLayout;
 import javax.swing.GroupLayout;
 
 import java.awt.Image;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -82,14 +81,16 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             "images/yellow_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));   
     private static ImageIcon RED_LIGHT = new ImageIcon(ImageUtils.getImage(
             "images/red_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
-      
+          
     private JTabbedPane tabPanel = null;
-    private JPanel statusPanel = null;
-    private JPanel setupPanel = null;
+    private StatusPanel statusPanel = null;
+    private SetupPanel setupPanel = null;
     private JTabbedPane videoPanel = null;
-    private JPanel analogPanel = null;
-    private JPanel digitalPanel = null;
-    private JPanel agcPanel = null;
+    private AnalogPanel analogPanel = null;
+    private DigitalPanel digitalPanel = null;
+    private JTabbedPane agcPanel = null;
+    private AGCDDEPanel agcDdePanel = null;
+    private RoiPanel roiPanel = null;
     private JPanel thermalPanel = null;
     
     private JPanel bottomPanel = null;
@@ -129,9 +130,8 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         );
         this.setLayout(new BorderLayout());
         this.add(contentPanel, BorderLayout.CENTER);
-        
-        sendConnectRequest();
-        
+               
+        sendConnectRequest(); 
     }
     
     private void sendConnectRequest(){
@@ -142,6 +142,18 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         ThermalCamControl msg = new ThermalCamControl();
         msg.setProcessCode(ThermalCamFunctionCodes.NO_OP.getFunctionCode());
         send(msg);  
+    }
+    
+    protected void sendCommand(ThermalCamControl msg){
+        addToMsgSentList(msg);
+        send(msg);
+    }
+    
+    private void addToMsgSentList(ThermalCamControl msg){
+        if(msgSentList == null){
+            msgSentList = new Vector<ThermalCamControl>();
+        }
+        msgSentList.add(msg);
     }
     
     // Thermal Cam Control message listener
@@ -177,13 +189,6 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
                 
             }
         }
-    }
-       
-    public void addToMsgSentList(ThermalCamControl msg){
-        if(msgSentList == null){
-            msgSentList = new Vector<ThermalCamControl>();
-        }
-        msgSentList.add(msg);
     }
 
     private void updateSerialNumber(byte[] args) {
@@ -243,16 +248,16 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     
     /** Panel Access Functions **/
     
-    public JPanel getStatusPanel(){
+    public StatusPanel getStatusPanel(){
         if(statusPanel == null){
             statusPanel = new StatusPanel();
         }
         return statusPanel;
     }
     
-    public JPanel getSetupPanel(){
+    public SetupPanel getSetupPanel(){
         if(setupPanel == null){
-            setupPanel = new SetupPanel();
+            setupPanel = new SetupPanel(this);
         }
         return setupPanel;
     }
@@ -266,25 +271,41 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return videoPanel;
     }
     
-    public JPanel getAnalogPanel(){
+    public AnalogPanel getAnalogPanel(){
         if(analogPanel == null){
             analogPanel = new AnalogPanel();
         }
         return analogPanel;
     }
     
-    public JPanel getDigitalPanel(){
+    public DigitalPanel getDigitalPanel(){
         if(digitalPanel == null){
             digitalPanel = new DigitalPanel();
         }
         return digitalPanel;
     }
-
-    public JPanel getAgcPanel(){
+    
+    public JTabbedPane getAgcPanel(){
         if(agcPanel == null){
-            agcPanel = new AGCDDEPanel();
+            agcPanel = new JTabbedPane();
+            agcPanel.addTab("AGC/DDE", getAgcDdePanel());
+            agcPanel.addTab("ROI", getRoiPanel());
         }
         return agcPanel;
+    }
+
+    public AGCDDEPanel getAgcDdePanel(){
+        if(agcDdePanel == null){
+            agcDdePanel = new AGCDDEPanel();
+        }
+        return agcDdePanel;
+    }
+    
+    public RoiPanel getRoiPanel(){
+        if(roiPanel == null){
+            roiPanel = new RoiPanel();
+        }
+        return roiPanel;
     }
     
     public JPanel getThermalPanel(){
@@ -383,6 +404,10 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         }
         
         return thermalCamMenuBar;
+    }
+    
+    protected long twoBytesToLong(byte first, byte second){
+        return (long)((first & 0xFF) << 8) | (second & 0xFF);
     }
 
     

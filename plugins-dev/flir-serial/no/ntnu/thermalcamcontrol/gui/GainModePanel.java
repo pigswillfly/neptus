@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -53,14 +56,16 @@ class GainModePanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private ThermalCamControlGui gui = null;
     private JLabel gainModeLabel = null;
     private JRadioButton gainModeLowRadioButton = null;
     private JRadioButton gainModeHighRadioButton = null;
     private JRadioButton gainModeAutoRadioButton = null;
     private ButtonGroup gainModeButtonGroup = null;
     
-    protected GainModePanel(){
+    protected GainModePanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -78,10 +83,25 @@ class GainModePanel extends JPanel implements ReplyAction{
         this.setBorder(BorderFactory.createEtchedBorder());
 
         gainModeLowRadioButton.setText("Low");
+        gainModeLowRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_LOW.getArg());
+            }
+        });
 
         gainModeHighRadioButton.setText("High");
+        gainModeHighRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_HIGH.getArg());
+            }
+        });
 
         gainModeAutoRadioButton.setText("Auto");
+        gainModeAutoRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_AUTO.getArg());
+            }
+        });
 
         gainModeLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         gainModeLabel.setText("Gain Mode");
@@ -112,17 +132,53 @@ class GainModePanel extends JPanel implements ReplyAction{
                 .addComponent(gainModeHighRadioButton)
                 .addContainerGap())
         );
-
-        gainModeAutoRadioButton.setSelected(true);
     }
-
+    
+    private void sendGainModeCommand(long arg){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GAIN_MODE_SET);
+        byte[] args = new byte[msg.getByteCount()];
+        args[0] = 0x00;
+        args[1] = (byte) arg;
+    }
+    
+    protected void askForSettings(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GAIN_MODE_GET);
+        gui.sendCommand(msg);
+    }
+    
+    protected long getGainMode(){
+        if(gainModeAutoRadioButton.isSelected()){
+            return ThermalCamArguments.GAIN_MODE_AUTO.getArg();
+        } else if (gainModeHighRadioButton.isSelected()){
+            return ThermalCamArguments.GAIN_MODE_HIGH.getArg();
+        } else if (gainModeLowRadioButton.isSelected()){
+            return ThermalCamArguments.GAIN_MODE_LOW.getArg();
+        } else {
+            return ThermalCamArguments.GAIN_MODE_MANUAL.getArg();
+        }
+    }
+    
+    
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
         
+        if((rec.getArgs().equals(sent.getArgs())) || (sent.getByteCount() == 0)){
+            long setting = rec.getArgs()[1];
+            if(setting == ThermalCamArguments.GAIN_MODE_AUTO.getArg()){
+                gainModeAutoRadioButton.setSelected(true);                   
+            } else if (setting == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
+                gainModeHighRadioButton.setSelected(true);
+            } else if (setting == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
+                gainModeLowRadioButton.setSelected(true);                
+            } else if (setting == ThermalCamArguments.GAIN_MODE_MANUAL.getArg()){
+                //?
+            }   
+        } else {
+            // replied with different setting to command
+        }
     }
 
     /* (non-Javadoc)
@@ -130,8 +186,13 @@ class GainModePanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        if(sent.getByteCount() == ThermalCamFunctionCodes.GAIN_MODE_SET.getCmdByteCount()){
+            long arg = sent.getArgs()[1];
+            sendGainModeCommand(arg);
+            // what if error with sent message argument?
+        } else if (sent.getByteCount() == ThermalCamFunctionCodes.GAIN_MODE_GET.getCmdByteCount()){
+            // askForSettings();
+        }
     }
 
 }

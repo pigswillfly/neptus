@@ -45,9 +45,9 @@ public class UseThermalCamMsgUpdater{
     }
     
     public static void callOnReply(ThermalCamFunctionCodes code, ThermalCamControl sent, ThermalCamControl rec){
-        code.getMessageUpdaterClass().executeOnReply(sent, rec);
+        //code.getMessageUpdaterClass().executeOnReply(sent, rec);
     }
     public static void callIfNoReply(ThermalCamFunctionCodes code, ThermalCamControl sent){
-        code.getMessageUpdaterClass().executeIfNoReply(sent);
+        //code.getMessageUpdaterClass().executeIfNoReply(sent);
     }
 }

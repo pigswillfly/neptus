@@ -35,7 +35,7 @@ package no.ntnu.thermalcamcontrol.gui;
  * @author liz
  *
  */
-enum ThermalCamArguments {
+public enum ThermalCamArguments {
     BAUD_AUTO(0x0000),
     BAUD_9600(0x0001),
     BAUD_19200(0x0002),

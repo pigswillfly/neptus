@@ -68,7 +68,7 @@ public class OpenThermalCamControlGuiAction extends ConsoleAction {
     public void actionPerformed(ActionEvent e) {
         if (thermalCamControlFrame == null) {
             final ThermalCamControlGui thermalCamGuiMainPanel = new ThermalCamControlGui(console);
-            ThermalCamFunctionCodes.setThermalCamControlGui(thermalCamGuiMainPanel);
+            
             thermalCamControlFrame = new JFrame(I18n.text("FLIR Tau 2 Camera Control Gui"));
             thermalCamControlFrame.addWindowListener(new WindowAdapter() {
                 @Override

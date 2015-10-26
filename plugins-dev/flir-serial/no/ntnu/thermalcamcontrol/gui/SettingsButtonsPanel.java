@@ -98,8 +98,12 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(sent.getFunction() == ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS.getFunctionCode()){
+            // reset everything to indicate factory defaults
+        }
+        else{
+            
+        }
     }
 
     /* (non-Javadoc)
@@ -107,7 +111,13 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
+        if(sent.getFunction() == ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS.getFunctionCode()){
+            //send(ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS));
+            
+        }
+        else{
+            
+        }
         
     }
     
