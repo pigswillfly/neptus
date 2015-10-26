@@ -31,6 +31,8 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import javax.swing.JPanel;
+
 import pt.lsts.imc.ThermalCamControl;
 
 /**
@@ -38,16 +40,17 @@ import pt.lsts.imc.ThermalCamControl;
  *
  */
 public class UseThermalCamMsgUpdater{
+        
     public interface ReplyAction {
         public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec);
         
         public void executeIfNoReply(ThermalCamControl sent);
     }
     
-    public static void callOnReply(ThermalCamFunctionCodes code, ThermalCamControl sent, ThermalCamControl rec){
-        //code.getMessageUpdaterClass().executeOnReply(sent, rec);
+    public static void callOnReply(ReplyAction homePanel, ThermalCamControl sent, ThermalCamControl rec){
+        homePanel.executeOnReply(sent, rec);
     }
-    public static void callIfNoReply(ThermalCamFunctionCodes code, ThermalCamControl sent){
-        //code.getMessageUpdaterClass().executeIfNoReply(sent);
+    public static void callIfNoReply(ReplyAction homePanel, ThermalCamControl sent){
+        homePanel.executeIfNoReply(sent);
     }
 }

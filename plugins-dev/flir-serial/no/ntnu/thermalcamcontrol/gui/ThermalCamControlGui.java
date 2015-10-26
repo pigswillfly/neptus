@@ -130,8 +130,24 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         );
         this.setLayout(new BorderLayout());
         this.add(contentPanel, BorderLayout.CENTER);
+        
+        setupHomePanels();
                
         sendConnectRequest(); 
+    }
+    
+    private void setupHomePanels(){
+        for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
+            if(code.getHomePanel() == "ThermalCamControlGui"){
+                code.setReplyAction(this);
+            } else if (code.getHomePanel() == "FfcPanel"){
+                code.setReplyAction(getSetupPanel().getFFCPanel());
+            } else if (code.getHomePanel() == "GainModePanel"){
+                code.setReplyAction(getSetupPanel().getGainModePanel());
+            } else {
+                
+            }
+        }
     }
     
     private void sendConnectRequest(){
@@ -169,16 +185,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
                     if(sent.getFunction() == msg.getFunction()){
                         // Reply received
                         for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
-                            if (code.getFunctionCode() == msg.getFunction()){
-                                UseThermalCamMsgUpdater.callOnReply(code, sent, msg);
-                            }
+                            UseThermalCamMsgUpdater.callOnReply(code.getReplyAction(), sent, msg);
                         }
                     }
                     else{
                         // Send again, no reply
                         for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
                             if(code.getFunctionCode() == msg.getFunction()){
-                                UseThermalCamMsgUpdater.callIfNoReply(code, sent);
+                                UseThermalCamMsgUpdater.callIfNoReply(code.getReplyAction(), sent);
                             }
                         }
                     } 
