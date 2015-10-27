@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -48,13 +51,16 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui = null;
 
     private JButton factoryDefaultsButton = null;
     private JButton resetCameraButton = null;
     private JButton saveSettingsButton = null;
     
-    protected SettingsButtonsPanel(){
+    protected SettingsButtonsPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -64,8 +70,25 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
         saveSettingsButton = new JButton();
 
         factoryDefaultsButton.setText("Factory Defaults");
+        factoryDefaultsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendFactoryDefaultsMessage();
+            }
+        });
+        
         resetCameraButton.setText("Reset Camera");
+        factoryDefaultsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendResetMessage();
+            }
+        });
+        
         saveSettingsButton.setText("Save Settings");
+        factoryDefaultsButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendSaveSettingsMessage();
+            }
+        });
 
         GroupLayout settingsButtonsPanelLayout = new GroupLayout(this);
         this.setLayout(settingsButtonsPanelLayout);
@@ -92,6 +115,21 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
                 .addContainerGap())
         );
     }
+    
+    protected void sendFactoryDefaultsMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS);
+        gui.sendCommand(msg);
+    }
+    
+    protected void sendResetMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.CAMERA_RESET);
+        gui.sendCommand(msg);
+    }
+    
+    protected void sendSaveSettingsMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.SET_DEFAULTS);
+        gui.sendCommand(msg);
+    }
 
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
@@ -99,10 +137,11 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(sent.getFunction() == ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS.getFunctionCode()){
-            // reset everything to indicate factory defaults
-        }
-        else{
-            
+            gui.getFactorySettings().reflectSettings();
+        } else if (sent.getFunction() == ThermalCamFunctionCodes.CAMERA_RESET.getFunctionCode()){
+            gui.getSavedSettings().reflectSettings();
+        } else if (sent.getFunction() == ThermalCamFunctionCodes.SET_DEFAULTS.getFunctionCode()){
+            gui.getSavedSettings().saveSettings();            
         }
     }
 
@@ -112,15 +151,11 @@ class SettingsButtonsPanel extends JPanel implements ReplyAction{
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
         if(sent.getFunction() == ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS.getFunctionCode()){
-            //send(ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.RESTORE_FACTORY_DEFAULTS));
-            
+            sendFactoryDefaultsMessage();
+        } else if (sent.getFunction() == ThermalCamFunctionCodes.CAMERA_RESET.getFunctionCode()){
+            sendResetMessage();
+        } else if (sent.getFunction() == ThermalCamFunctionCodes.SET_DEFAULTS.getFunctionCode()){
+            sendSaveSettingsMessage();
         }
-        else{
-            
-        }
-        
     }
-    
-    
-
 }

@@ -56,6 +56,8 @@ class GainModePanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private long gainMode;
+    
     private ThermalCamControlGui gui = null;
     private JLabel gainModeLabel = null;
     private JRadioButton gainModeLowRadioButton = null;
@@ -147,17 +149,21 @@ class GainModePanel extends JPanel implements ReplyAction{
     }
     
     protected long getGainMode(){
-        if(gainModeAutoRadioButton.isSelected()){
-            return ThermalCamArguments.GAIN_MODE_AUTO.getArg();
-        } else if (gainModeHighRadioButton.isSelected()){
-            return ThermalCamArguments.GAIN_MODE_HIGH.getArg();
-        } else if (gainModeLowRadioButton.isSelected()){
-            return ThermalCamArguments.GAIN_MODE_LOW.getArg();
-        } else {
-            return ThermalCamArguments.GAIN_MODE_MANUAL.getArg();
-        }
+        return gainMode;
     }
     
+    protected void setGainMode(long gainMode){
+        if(gainMode == ThermalCamArguments.GAIN_MODE_AUTO.getArg()){
+            this.gainMode = gainMode;
+            gainModeAutoRadioButton.setSelected(true);
+        } else if (gainMode == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
+            this.gainMode = gainMode;
+            gainModeLowRadioButton.setSelected(true);
+        } else if (gainMode == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
+            this.gainMode = gainMode;
+            gainModeHighRadioButton.setSelected(true);
+        } 
+    }
     
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
@@ -167,15 +173,7 @@ class GainModePanel extends JPanel implements ReplyAction{
         
         if((rec.getArgs().equals(sent.getArgs())) || (sent.getByteCount() == 0)){
             long setting = rec.getArgs()[1];
-            if(setting == ThermalCamArguments.GAIN_MODE_AUTO.getArg()){
-                gainModeAutoRadioButton.setSelected(true);                   
-            } else if (setting == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
-                gainModeHighRadioButton.setSelected(true);
-            } else if (setting == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
-                gainModeLowRadioButton.setSelected(true);                
-            } else if (setting == ThermalCamArguments.GAIN_MODE_MANUAL.getArg()){
-                //?
-            }   
+            setGainMode(setting);
         } else {
             // replied with different setting to command
         }

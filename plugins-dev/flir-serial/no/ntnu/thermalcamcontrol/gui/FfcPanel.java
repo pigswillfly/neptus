@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -56,7 +59,18 @@ class FfcPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private static final long TEMP_DELTA_MIN = 0;
+    private static final long TEMP_DELTA_MAX = 1000;
+    private static final long FFC_PERIOD_MIN = 0;
+    private static final long FFC_PERIOD_MAX = 30000;
+    
     private ThermalCamControlGui gui = null;
+    
+    private int ffcMode;
+    private long ffcTempDelta;
+    private long lowGainFfcTempDelta;
+    private long ffcPeriod;
+    private long lowGainFfcPeriod;
     
     private JLabel ffcLabel = null;
     private JRadioButton ffcAutoRadioButton = null;
@@ -110,37 +124,112 @@ class FfcPanel extends JPanel implements ReplyAction{
         ffcButtonGroup.add(ffcExternalRadioButton);
         
         this.setBorder(BorderFactory.createEtchedBorder());
-
-        ffcAutoRadioButton.setText("Auto");
-
-        tempChangeUnitLabel.setText("0.1 °C");
-
-        ffcLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         ffcLabel.setText("Flat Field Correction");
 
-        lowGainTempChangeLabel.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
-        lowGainTempChangeLabel.setText("Low Gain Temp Change");
-
+        ffcAutoRadioButton.setText("Auto");
+        ffcAutoRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                if(ffcMode != ThermalCamArguments.FFC_MODE_AUTO.getArg()){
+                    setFFCModeMessage(ThermalCamArguments.FFC_MODE_AUTO.getArg());
+                }                
+            }
+        });
         ffcManualRadioButton.setText("Manual");
+        ffcManualRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                if(ffcMode != ThermalCamArguments.FFC_MODE_MANUAL.getArg()){
+                    setFFCModeMessage(ThermalCamArguments.FFC_MODE_MANUAL.getArg());
+                }
+            }
+        });
+        ffcExternalRadioButton.setText("External");
+        ffcExternalRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                if(ffcMode != ThermalCamArguments.FFC_MODE_EXTERNAL.getArg()){
+                    setFFCModeMessage(ThermalCamArguments.FFC_MODE_EXTERNAL.getArg());
+                }
+            }
+        });
+        
+        tempChangeText.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = TEMP_DELTA_MAX + 1;
+                try {
+                    value = Long.parseLong(tempChangeText.getText());
+                } catch(NumberFormatException error){
+                    tempChangeText.setText(String.valueOf(ffcTempDelta));
+                }
+                if((value > TEMP_DELTA_MIN) && (value < TEMP_DELTA_MAX)){
+                    setFFCTempDeltaOrPeriodMessage(lowGainFfcTempDelta, value, false, false);
+                    ffcTempDelta = value;
+                } else {
+                    tempChangeText.setText(String.valueOf(ffcTempDelta));
+                }
+            }
+        });
+        
+        lowGainTempChangeText.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = TEMP_DELTA_MAX + 1;
+                try {
+                    value = Long.parseLong(lowGainTempChangeText.getText());
+                } catch(NumberFormatException error){
+                    lowGainTempChangeText.setText(String.valueOf(lowGainFfcTempDelta));
+                }
+                if((value > TEMP_DELTA_MIN) && (value < TEMP_DELTA_MAX)){
+                    setFFCTempDeltaOrPeriodMessage(value, ffcTempDelta, false, false);
+                    lowGainFfcTempDelta = value;
+                } else {
+                    lowGainTempChangeText.setText(String.valueOf(lowGainFfcTempDelta));
+                }
+            }
+        });
+        
+        ffcIntervalText.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = FFC_PERIOD_MAX + 1;
+                try {
+                    value = Long.parseLong(ffcIntervalText.getText());
+                } catch(NumberFormatException error){
+                    ffcIntervalText.setText(String.valueOf(ffcPeriod));
+                }
+                if((value > FFC_PERIOD_MIN) && (value < FFC_PERIOD_MAX)){
+                    setFFCTempDeltaOrPeriodMessage(lowGainFfcPeriod, value, false, true);
+                    ffcPeriod = value;
+                } else {
+                    ffcIntervalText.setText(String.valueOf(ffcPeriod));
+                }
+            }
+        });
+        
+        lowGainFFCIntervalText.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = FFC_PERIOD_MAX + 1;
+                try {
+                    value = Long.parseLong(lowGainFFCIntervalText.getText());
+                } catch(NumberFormatException error){
+                    lowGainFFCIntervalText.setText(String.valueOf(lowGainFfcPeriod));
+                }
+                if((value > FFC_PERIOD_MIN) && (value < FFC_PERIOD_MAX)){
+                    setFFCTempDeltaOrPeriodMessage(value, ffcPeriod, false, true);
+                    lowGainFfcPeriod = value;
+                } else {
+                    lowGainFFCIntervalText.setText(String.valueOf(lowGainFfcPeriod));
+                }
+            }
+        });
 
-        doFFCButton.setText("Do FFC");
-
-        tempChangeLabel.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
-        tempChangeLabel.setText("Temp Change");
-
-        lowGainFFCIntervalUnitLabel.setText("frames");
-
-        ffcIntervalUnitLabel.setText("frames");
-
-        ffcIntervalLabel.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
         ffcIntervalLabel.setText("FFC Interval");
-
-        lowGainFFCIntervalLabel.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
         lowGainFFCIntervalLabel.setText("Low Gain FFC Interval");
-
+        lowGainFFCIntervalUnitLabel.setText("frames");
+        ffcIntervalUnitLabel.setText("frames");
+        
+        lowGainTempChangeLabel.setText("Low Gain Temp Change");
+        tempChangeLabel.setText("Temp Change");
+        tempChangeUnitLabel.setText("0.1 °C");
         lowGainTempChangeUnitLabel.setText("0.1 °C");
 
-        ffcExternalRadioButton.setText("External");
+        doFFCButton.setText("Do FFC");
 
         GroupLayout ffcPanelLayout = new GroupLayout(this);
         this.setLayout(ffcPanelLayout);
@@ -228,32 +317,133 @@ class FfcPanel extends JPanel implements ReplyAction{
     protected void askForSettings(){
         ThermalCamControl modeMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_MODE_SELECT_GET);
         gui.sendCommand(modeMsg);
-
+        ThermalCamControl tempDeltaMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET);
+        gui.sendCommand(tempDeltaMsg);
+        ThermalCamControl periodMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_PERIOD_GET);
+        gui.sendCommand(periodMsg);
+    }
+    
+    protected void setFFCModeMessage(long arg){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_MODE_SELECT_SET);
+        byte[] args = new byte[msg.getByteCount()];
+        args[0] = 0x00;
+        args[1] = (byte) arg;
+        msg.setArgs(args);
+        gui.sendCommand(msg);
+    }
+    
+    protected void setFFCTempDeltaOrPeriodMessage(long lowGain, long highGain, boolean oneOnly, boolean period){
+        ThermalCamFunctionCodes code = null;
+        if((period) && (oneOnly)){
+            code = ThermalCamFunctionCodes.FFC_PERIOD_SET;
+        } else if ((period) && (!oneOnly)){
+            code = ThermalCamFunctionCodes.FFC_PERIOD_SPECIFY;
+        } else if ((!period) && (oneOnly)){
+            code = ThermalCamFunctionCodes.FFC_TEMP_DELTA_SET;
+        } else if ((!period) && (!oneOnly)){
+            code = ThermalCamFunctionCodes.FFC_TEMP_DELTA_SPECIFY;
+        }
+        
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(code);
+        byte[] args = new byte[msg.getByteCount()];
+        
+        if(oneOnly){
+            if(gui.getSetupPanel().getGainModePanel().getGainMode() == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
+                args = gui.longtoTwoBytes(lowGain);
+                msg.setArgs(args);
+            } else if (gui.getSetupPanel().getGainModePanel().getGainMode() == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
+                args = gui.longtoTwoBytes(highGain);
+                msg.setArgs(args);
+            }
+        } else {
+            byte[] lowGainArg = gui.longtoTwoBytes(lowGain);
+            byte[] highGainArg = gui.longtoTwoBytes(highGain);
+            args[0] = lowGainArg[0];
+            args[1] = lowGainArg[1];
+            args[2] = highGainArg[0];
+            args[3] = highGainArg[1];
+            msg.setArgs(args);
+        }
+        
+        gui.sendCommand(msg);
+        
+    }
+    
+    protected void setFFCMode(int setting){
+        if(setting == ThermalCamArguments.FFC_MODE_AUTO.getArg()){
+            ffcAutoRadioButton.setSelected(true);
+            ffcMode = setting;
+        } else if (setting == ThermalCamArguments.FFC_MODE_MANUAL.getArg()){
+            ffcManualRadioButton.setSelected(true);
+            ffcMode = setting;
+        } else if (setting == ThermalCamArguments.FFC_MODE_EXTERNAL.getArg()){
+            ffcExternalRadioButton.setSelected(true);
+            ffcMode = setting;
+        } else {
+            //unknown mode
+        }
+    }
+    
+    protected int getFFCMode(){
+        return ffcMode;
+    }
+    
+    protected void setFFCTempDelta(long tempDelta, boolean lowGain){
+        if(lowGain){
+            lowGainTempChangeText.setText(String.valueOf(tempDelta));    
+            this.lowGainFfcTempDelta = tempDelta;
+        } else {
+            tempChangeText.setText(String.valueOf(tempDelta));
+            this.ffcTempDelta = tempDelta;
+        }
+    }
+    
+    protected long getFFCTempDelta(boolean lowGain){
+        if(lowGain){
+            return this.lowGainFfcTempDelta;
+        } else {
+            return this.ffcTempDelta;
+        }
+    }
+    
+    protected void setFFCPeriod(long period, boolean lowGain){
+        if(lowGain){
+            lowGainFFCIntervalText.setText(String.valueOf(period));    
+            this.lowGainFfcPeriod = period;
+        } else {
+            ffcIntervalText.setText(String.valueOf(period));
+            this.ffcPeriod = period;
+        }
+    }
+    
+    protected long getFFCPeriod(boolean lowGain){
+        if(lowGain){
+            return this.lowGainFfcPeriod;
+        } else {
+            return this.ffcPeriod;
+        }
     }
 
+    private boolean isCurrentGainLow(){
+        return (gui.getSetupPanel().getGainModePanel().getGainMode() == ThermalCamArguments.GAIN_MODE_LOW.getArg());
+    }
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        
-        if(rec.getFunction() == ThermalCamFunctionCodes.FFC_MODE_SELECT_GET.getFunctionCode()){
+        int function = rec.getFunction();
+        if(function == ThermalCamFunctionCodes.FFC_MODE_SELECT_GET.getFunctionCode()){
             if(sent.getByteCount() < ThermalCamFunctionCodes.FFC_INTEG_FRAMES_GET.getCmdByteCount()){
                 if((sent.equals(rec)) || (sent.getByteCount() == 0)){
-                    long setting = rec.getArgs()[1];
-                    if(setting == ThermalCamArguments.FFC_MODE_AUTO.getArg()){
-                        ffcAutoRadioButton.setSelected(true);
-                    } else if (setting == ThermalCamArguments.FFC_MODE_MANUAL.getArg()){
-                        ffcManualRadioButton.setSelected(true);
-                    } else if (setting == ThermalCamArguments.FFC_MODE_EXTERNAL.getArg()){
-                        ffcExternalRadioButton.setSelected(true);
-                    } else {
-                        //unknown mode
-                    }
+                    int setting = rec.getArgs()[1];
+                    setFFCMode(setting);
                 } else {
                     //reply has different setting to command
                 }
             } else if (sent.getByteCount() == ThermalCamFunctionCodes.FFC_INTEG_FRAMES_GET.getCmdByteCount()){
+               
+                /* 
                 int setOrGet = sent.getArgs()[1];
                 if(setOrGet == ThermalCamArguments.FFC_INTEG_FRAMES_SET.getArg()){
                     if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_INTEG_FRAMES_SET.getCmdByteCount()){
@@ -269,33 +459,31 @@ class FfcPanel extends JPanel implements ReplyAction{
                         
                     }
                 }
+                */
             }
-        } else if (rec.getFunction() == ThermalCamFunctionCodes.DO_FFC_AUTO.getFunctionCode()){
+        } else if (function == ThermalCamFunctionCodes.DO_FFC_AUTO.getFunctionCode()){
             // check status
-        } else if (rec.getFunction() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getFunctionCode()){
-            if((sent.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getCmdByteCount()) 
-            && (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getReplyByteCount())){
-                long gainMode = gui.getSetupPanel().getGainModePanel().getGainMode();
+        } else if (function == ThermalCamFunctionCodes.FFC_PERIOD_GET.getFunctionCode()){
+            if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getReplyByteCount()){
                 long ffcPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
-                if(gainMode == ThermalCamArguments.GAIN_MODE_LOW.getArg()){
-                    lowGainFFCIntervalText.setText(String.valueOf(ffcPeriod));    
-                } else if (gainMode == ThermalCamArguments.GAIN_MODE_HIGH.getArg()){
-                    ffcIntervalText.setText(String.valueOf(ffcPeriod));
-                } else {
-                    // Don't know gain mode
-                }
-            } else if ((sent.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getCmdByteCount()) 
-                    && (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getReplyByteCount())){
-                long lowGainPeriod, highGainPeriod;
-                lowGainPeriod = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
-                highGainPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
-                lowGainFFCIntervalText.setText(String.valueOf(lowGainPeriod));
-                ffcIntervalText.setText(String.valueOf(highGainPeriod));
-            }
-
+                setFFCPeriod(ffcPeriod, isCurrentGainLow());
+            } else if (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getReplyByteCount()){
+                long lowGainPeriod = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
+                long highGainPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                setFFCPeriod(lowGainPeriod, true);
+                setFFCPeriod(highGainPeriod, false);
+            } 
+        } else if (function == ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET.getFunctionCode()){
+            if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_TEMP_DELTA_SET.getReplyByteCount()){
+                long tempDelta = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                setFFCTempDelta(tempDelta, isCurrentGainLow());
+            } else if (rec.getByteCount() == ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET.getReplyByteCount()){
+                long lowGainTempDelta = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
+                long highGainTempDelta = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                setFFCTempDelta(lowGainTempDelta, true);
+                setFFCTempDelta(highGainTempDelta, false);
+            } 
         }
-        
-        
     }
 
     /* (non-Javadoc)
@@ -303,8 +491,7 @@ class FfcPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
     
 }

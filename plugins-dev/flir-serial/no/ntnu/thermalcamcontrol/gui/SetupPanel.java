@@ -117,14 +117,14 @@ class SetupPanel extends JPanel implements ReplyAction{
     protected OperatingModePanel getOperatingModePanel(){
         
         if(operatingModePanel == null)
-            operatingModePanel = new OperatingModePanel();
+            operatingModePanel = new OperatingModePanel(this.gui);
         return operatingModePanel;
     }
     
     protected TestPatternPanel getTestPatternPanel(){
         
         if(testPatternPanel == null)
-            testPatternPanel = new TestPatternPanel();
+            testPatternPanel = new TestPatternPanel(this.gui);
         return testPatternPanel;
     }
     
@@ -153,7 +153,7 @@ class SetupPanel extends JPanel implements ReplyAction{
     public SettingsButtonsPanel getSettingsButtonsPanel(){
         
         if(settingsButtonsPanel == null)
-            settingsButtonsPanel = new SettingsButtonsPanel();
+            settingsButtonsPanel = new SettingsButtonsPanel(this.gui);
         return settingsButtonsPanel;
         
     }

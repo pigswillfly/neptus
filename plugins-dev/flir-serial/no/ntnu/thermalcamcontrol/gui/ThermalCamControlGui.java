@@ -70,11 +70,12 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
      * 
      */
     private static final long serialVersionUID = 1L;
-
+/*
     private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
             "images/thermal_cam.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
     private static ImageIcon ICON_BIG = new ImageIcon(ImageUtils.getImage(
             "images/thermal_cam.png").getScaledInstance(48, 48, Image.SCALE_SMOOTH));
+*/
     private static ImageIcon GREEN_LIGHT = new ImageIcon(ImageUtils.getImage(
             "images/green_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
     private static ImageIcon YELLOW_LIGHT = new ImageIcon(ImageUtils.getImage(
@@ -82,6 +83,9 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     private static ImageIcon RED_LIGHT = new ImageIcon(ImageUtils.getImage(
             "images/red_light.png").getScaledInstance(20, 20, Image.SCALE_SMOOTH));
           
+    private ThermalCamSettings factorySettings = null;
+    private ThermalCamSettings savedSettings = null;
+    
     private JTabbedPane tabPanel = null;
     private StatusPanel statusPanel = null;
     private SetupPanel setupPanel = null;
@@ -124,12 +128,15 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         contentPanelLayout.setVerticalGroup(
                 contentPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                 .addGroup(contentPanelLayout.createSequentialGroup()
-                    .addComponent(tabPanel)
+                    .addComponent(getTabPanel())
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                    .addComponent(bottomPanel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(getBottomPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
         );
         this.setLayout(new BorderLayout());
         this.add(contentPanel, BorderLayout.CENTER);
+        
+        factorySettings = new ThermalCamSettings(this);
+        savedSettings = new ThermalCamSettings(this);
         
         setupHomePanels();
                
@@ -138,12 +145,19 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     
     private void setupHomePanels(){
         for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
-            if(code.getHomePanel() == "ThermalCamControlGui"){
+            String homePanel = code.getHomePanel();
+            if(homePanel == "ThermalCamControlGui"){
                 code.setReplyAction(this);
-            } else if (code.getHomePanel() == "FfcPanel"){
+            } else if (homePanel == "FfcPanel"){
                 code.setReplyAction(getSetupPanel().getFFCPanel());
-            } else if (code.getHomePanel() == "GainModePanel"){
+            } else if (homePanel == "GainModePanel"){
                 code.setReplyAction(getSetupPanel().getGainModePanel());
+            } else if (homePanel == "SettingsButtonsPanel"){
+                code.setReplyAction(getSetupPanel().getSettingsButtonsPanel());
+            } else if (homePanel == "TestPatternPanel"){
+                code.setReplyAction(getSetupPanel().getTestPatternPanel());
+            } else if (homePanel == "ExternalSyncPanel"){
+                code.setReplyAction(getSetupPanel().getExternalSyncPanel());
             } else {
                 
             }
@@ -235,6 +249,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             connectedLabel.setIcon(RED_LIGHT);
             connectedLabel.setText("Not connected");
         }
+    }
+    
+    protected ThermalCamSettings getFactorySettings(){
+        return factorySettings;
+    }
+    
+    protected ThermalCamSettings getSavedSettings(){
+        return savedSettings;
     }
  
     /* (non-Javadoc)
@@ -424,6 +446,12 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return (long)((first & 0xFF) << 8) | (second & 0xFF);
     }
 
+    protected byte[] longtoTwoBytes(long arg){
+        byte[] ret = new byte[2];
+        ret[0] = (byte) (arg & 0xFF);
+        ret[1] = (byte) ((arg >> 8) & 0xFF);
+        return ret;
+    }
     
     /* (non-Javadoc)
      * @see pt.lsts.neptus.console.ConsolePanel#cleanSubPanel()

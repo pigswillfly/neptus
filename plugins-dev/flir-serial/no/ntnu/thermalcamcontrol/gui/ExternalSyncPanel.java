@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -52,6 +55,9 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
      * 
      */
     private static final long serialVersionUID = 1L;
+    private ThermalCamControlGui gui;
+    
+    private long externalSyncSetting;
     
     private JLabel externalSyncLabel = null;
     private JRadioButton externalSyncSlaveRadioButton = null;
@@ -59,8 +65,9 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
     private JRadioButton externalSyncDisableRadioButton = null;
     private ButtonGroup externalSyncButtonGroup = null;
 
-    protected ExternalSyncPanel(){
+    protected ExternalSyncPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -78,8 +85,25 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
         this.setBorder(BorderFactory.createEtchedBorder());
 
         externalSyncSlaveRadioButton.setText("Slave");
+        externalSyncSlaveRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_SLAVE.getArg());
+            }
+        });
+
         externalSyncMasterRadioButton.setText("Master");
+        externalSyncMasterRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_MASTER.getArg());
+            }
+        });
+        
         externalSyncDisableRadioButton.setText("Disable");
+        externalSyncDisableRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_DISABLED.getArg());
+            }
+        });
 
         externalSyncLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         externalSyncLabel.setText("External Sync");
@@ -114,13 +138,37 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
         externalSyncDisableRadioButton.setSelected(true);
     }
 
+    private void sendExternalSyncMessage(long setting){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.EXTERNAL_SYNC_GET);
+        msg.setArgs(gui.longtoTwoBytes(setting));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setExternalSync(long setting){
+        if(setting == ThermalCamArguments.EXTERNAL_SYNC_DISABLED.getArg()){
+            this.externalSyncSetting = setting;
+            externalSyncDisableRadioButton.setSelected(true);
+        } else if (setting == ThermalCamArguments.EXTERNAL_SYNC_SLAVE.getArg()){
+            this.externalSyncSetting = setting;
+            externalSyncSlaveRadioButton.setSelected(true);
+        } else if (setting == ThermalCamArguments.EXTERNAL_SYNC_MASTER.getArg()){
+            this.externalSyncSetting = setting;
+            externalSyncMasterRadioButton.setSelected(true);
+        }
+    }
+    
+    protected long getExternalSyncSetting(){
+        return this.externalSyncSetting;
+    }
+    
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.EXTERNAL_SYNC_GET.getFunctionCode()){
+            setExternalSync(gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]));
+        }
     }
 
     /* (non-Javadoc)
@@ -128,7 +176,7 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
+        gui.sendCommand(sent);
         
     }
 }

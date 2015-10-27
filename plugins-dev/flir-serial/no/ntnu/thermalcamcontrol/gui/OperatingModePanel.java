@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -39,27 +42,30 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle;
 
-import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
-import pt.lsts.imc.ThermalCamControl;
-
 /**
  * @author liz
  *
  */
-class OperatingModePanel extends JPanel implements ReplyAction{
+class OperatingModePanel extends JPanel{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     
+    @SuppressWarnings("unused")
+    private ThermalCamControlGui gui;
+    
+    private int operatingMode;
+    
     private JLabel operatingModeLabel = null;
     private JRadioButton operatingModeRealTimeRadioButton = null;
     private JRadioButton operatingModeFrozenRadioButton = null;
     private ButtonGroup operatingModeButtonGroup = null;
     
-    protected OperatingModePanel(){
+    protected OperatingModePanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -78,8 +84,18 @@ class OperatingModePanel extends JPanel implements ReplyAction{
         operatingModeLabel.setText("Operating Mode");
 
         operatingModeRealTimeRadioButton.setText("Real Time");
+        operatingModeRealTimeRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                // notify video panel?
+            }
+        });
 
         operatingModeFrozenRadioButton.setText("Frozen");
+        operatingModeRealTimeRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                // notify video panel?
+            }
+        });
 
         GroupLayout operatingModePanelLayout = new GroupLayout(this);
         this.setLayout(operatingModePanelLayout);
@@ -107,23 +123,17 @@ class OperatingModePanel extends JPanel implements ReplyAction{
 
         operatingModeRealTimeRadioButton.setSelected(true);
     }
-
-    /* (non-Javadoc)
-     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
-     */
-    @Override
-    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+    
+    protected int getOperatingMode(){
+        return operatingMode;
     }
-
-    /* (non-Javadoc)
-     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
-     */
-    @Override
-    public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+    
+    protected void setOperatingMode(int mode){
+        if(mode == ThermalCamArguments.VIDEO_MODE_REAL_TIME.getArg()){
+            this.operatingMode = mode;
+        } else if (mode == ThermalCamArguments.VIDEO_MODE_FREEZE.getArg()){
+            this.operatingMode = mode;
+        }
     }
 
 }

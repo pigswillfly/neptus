@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -52,14 +55,18 @@ class TestPatternPanel extends JPanel implements ReplyAction {
      * 
      */
     private static final long serialVersionUID = 1L;
+    private ThermalCamControlGui gui;
+    
+    private long testPattern;
     
     private JLabel testPatternLabel = null;
     private JRadioButton testPatternRampRadioButton = null;
     private JRadioButton testPatternOffRadioButton = null;
     private ButtonGroup testPatternButtonGroup = null;
     
-    protected TestPatternPanel(){
+    protected TestPatternPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -78,8 +85,18 @@ class TestPatternPanel extends JPanel implements ReplyAction {
         testPatternLabel.setText("Test Pattern");
 
         testPatternRampRadioButton.setText("Ramp");
+        testPatternRampRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                setTestPatternMessage(ThermalCamArguments.TEST_PATTERN_14BIT_ASCENDING_RAMP.getArg());
+            }
+        });
 
         testPatternOffRadioButton.setText("Off");
+        testPatternRampRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                setTestPatternMessage(ThermalCamArguments.TEST_PATTERN_OFF.getArg());
+            }
+        });
 
         GroupLayout testPatternPanelLayout = new GroupLayout(this);
         this.setLayout(testPatternPanelLayout);
@@ -104,9 +121,26 @@ class TestPatternPanel extends JPanel implements ReplyAction {
                 .addComponent(testPatternRampRadioButton)
                 .addContainerGap(20, Short.MAX_VALUE))
         );
-
-        testPatternOffRadioButton.setSelected(true);
-
+    }
+    
+    private void setTestPatternMessage(long pattern){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.TEST_PATTERN_SET);
+        msg.setArgs(gui.longtoTwoBytes(pattern));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setTestPattern(long pattern){
+        if(pattern == ThermalCamArguments.TEST_PATTERN_OFF.getArg()){
+            this.testPattern = pattern;
+            testPatternOffRadioButton.setSelected(true);
+        } else if (pattern == ThermalCamArguments.TEST_PATTERN_14BIT_ASCENDING_RAMP.getArg()){
+            this.testPattern = pattern;
+            testPatternRampRadioButton.setSelected(true);
+        } 
+    }
+    
+    protected long getTestPattern(){
+        return this.testPattern;
     }
 
     /* (non-Javadoc)
@@ -114,8 +148,9 @@ class TestPatternPanel extends JPanel implements ReplyAction {
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.TEST_PATTERN_GET.getFunctionCode()){
+            setTestPattern(gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]));
+        }
     }
 
     /* (non-Javadoc)
@@ -123,8 +158,7 @@ class TestPatternPanel extends JPanel implements ReplyAction {
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);        
     }
 
 }
