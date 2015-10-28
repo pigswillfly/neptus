@@ -87,21 +87,21 @@ class GainModePanel extends JPanel implements ReplyAction{
         gainModeLowRadioButton.setText("Low");
         gainModeLowRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_LOW.getArg());
+                setGainModeMessage(ThermalCamArguments.GAIN_MODE_LOW.getArg());
             }
         });
 
         gainModeHighRadioButton.setText("High");
         gainModeHighRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_HIGH.getArg());
+                setGainModeMessage(ThermalCamArguments.GAIN_MODE_HIGH.getArg());
             }
         });
 
         gainModeAutoRadioButton.setText("Auto");
         gainModeAutoRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendGainModeCommand(ThermalCamArguments.GAIN_MODE_AUTO.getArg());
+                setGainModeMessage(ThermalCamArguments.GAIN_MODE_AUTO.getArg());
             }
         });
 
@@ -135,17 +135,17 @@ class GainModePanel extends JPanel implements ReplyAction{
                 .addContainerGap())
         );
     }
+
+    protected void getGainModeMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GAIN_MODE_GET);
+        gui.sendCommand(msg);
+    }
     
-    private void sendGainModeCommand(long arg){
+    private void setGainModeMessage(long arg){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GAIN_MODE_SET);
         byte[] args = new byte[msg.getByteCount()];
         args[0] = 0x00;
         args[1] = (byte) arg;
-    }
-    
-    protected void askForSettings(){
-        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GAIN_MODE_GET);
-        gui.sendCommand(msg);
     }
     
     protected long getGainMode(){
@@ -184,13 +184,7 @@ class GainModePanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        if(sent.getByteCount() == ThermalCamFunctionCodes.GAIN_MODE_SET.getCmdByteCount()){
-            long arg = sent.getArgs()[1];
-            sendGainModeCommand(arg);
-            // what if error with sent message argument?
-        } else if (sent.getByteCount() == ThermalCamFunctionCodes.GAIN_MODE_GET.getCmdByteCount()){
-            // askForSettings();
-        }
+        gui.sendCommand(sent);
     }
 
 }

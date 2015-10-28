@@ -156,7 +156,7 @@ public enum ThermalCamArguments {
     AGC_MODE_INFO_BASED_EQUALIZATION(0x000A),
     
     AGC_INFO_THRESHOLD(0x03),
-    AGC_SSO_PERCENT(0x03),
+    AGC_SSO_PERCENT(0x04),
     /***/
     
     READ_SENSOR_FPA_TEMP_DEGCx10(0x0000),

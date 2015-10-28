@@ -70,6 +70,8 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
      * 
      */
     private static final long serialVersionUID = 1L;
+    private static final String FPA_SIZE = "640×512";
+
 /*
     private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
             "images/thermal_cam.png").getScaledInstance(16, 16, Image.SCALE_SMOOTH));
@@ -97,16 +99,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     private RoiPanel roiPanel = null;
     private JPanel thermalPanel = null;
     
+    private JMenuBar thermalCamMenuBar = null;
     private JPanel bottomPanel = null;
     private JLabel connectedLabel = null;
     private JLabel partNumberLabel = null;
     private JLabel serialNumberLabel = null;
+    private JLabel fpaSizeLabel = null;
     private JLabel statusLabel = null;
     private List<ThermalCamControl> msgSentList = new Vector<ThermalCamControl>();
-    
-    private JMenuBar thermalCamMenuBar = null;
-    
-    //private PeriodicThermalCamConnectedQuery connectionStatusUpdater = null;
     
     public ThermalCamControlGui(ConsoleLayout console){
         super(console);
@@ -143,23 +143,51 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         sendConnectRequest(); 
     }
     
+    private void askForCurrentSettings(){
+        getSetupPanel().getFFCPanel().getFFCSettingsMessage();
+        getSetupPanel().getExternalSyncPanel().getExternalSyncMessage();
+        getSetupPanel().getGainModePanel().getGainModeMessage();
+        getSetupPanel().getTestPatternPanel().getTestPatternMessage();
+        getAgcDdePanel().getEnhancePanel().getEnhanceSettings();
+        getAgcDdePanel().getManualParamPanel().getManualParams();
+    }
+    
     private void setupHomePanels(){
         for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
             String homePanel = code.getHomePanel();
-            if(homePanel == "ThermalCamControlGui"){
-                code.setReplyAction(this);
-            } else if (homePanel == "FfcPanel"){
-                code.setReplyAction(getSetupPanel().getFFCPanel());
-            } else if (homePanel == "GainModePanel"){
-                code.setReplyAction(getSetupPanel().getGainModePanel());
-            } else if (homePanel == "SettingsButtonsPanel"){
-                code.setReplyAction(getSetupPanel().getSettingsButtonsPanel());
-            } else if (homePanel == "TestPatternPanel"){
-                code.setReplyAction(getSetupPanel().getTestPatternPanel());
-            } else if (homePanel == "ExternalSyncPanel"){
-                code.setReplyAction(getSetupPanel().getExternalSyncPanel());
-            } else {
-                
+            switch(homePanel){
+                case "StatusPanel":
+                    code.setReplyAction(getStatusPanel());
+                    break;
+                case "FfcPanel":
+                    code.setReplyAction(this.getSetupPanel().getFFCPanel());
+                    break;
+                case "GainModePanel":
+                    code.setReplyAction(this.getSetupPanel().getGainModePanel());
+                    break;
+                case "SettingsButtonsPanel":
+                    code.setReplyAction(this.getSetupPanel().getSettingsButtonsPanel());
+                    break;
+                case "TestPatternPanel":
+                    code.setReplyAction(this.getSetupPanel().getTestPatternPanel());
+                    break;
+                case "ExternalSyncPanel":
+                    code.setReplyAction(this.getSetupPanel().getExternalSyncPanel());
+                    break;
+                case "EnhancePanel":
+                    code.setReplyAction(this.getAgcDdePanel().getEnhancePanel());
+                    break;
+                case "ManualParamPanel":
+                    code.setReplyAction(this.getAgcDdePanel().getManualParamPanel());
+                    break;
+                case "AgcModesPanel":
+                    code.setReplyAction(this.getAgcDdePanel().getAgcModesPanel());
+                    break;
+                case "RoiPanel":
+                    code.setReplyAction(this.getRoiPanel());
+                    break;
+                default:
+                    code.setReplyAction(this);
             }
         }
     }
@@ -186,7 +214,8 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         msgSentList.add(msg);
     }
     
-    // Thermal Cam Control message listener
+    /** Thermal Cam Control message listener **/
+    
     @Subscribe
     public void on(ThermalCamControl msg){
         if(msg.getSourceName().equals(getConsole().getMainSystem())){
@@ -219,29 +248,30 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         }
     }
 
-    private void updateSerialNumber(byte[] args) {
-        serialNumberLabel.setText(args.toString());
+    /** Field setters and getters **/
+    
+    protected void setSerialNumber(long num) {
+        serialNumberLabel.setText(String.valueOf(num));
     }
     
-    private void updateCamPartNumber(byte[] args){
-        partNumberLabel.setText(args.toString());
+    protected void setPartNumber(String num){
+        partNumberLabel.setText(num);
     }
     
-    private void updateStatus(short status){
-        switch(status){
-            case 0x00:
-                statusLabel.setText("CAM OK");
-                break;
-            case 0x01:
-                
-                break;
-            default: 
-                statusLabel.setText("No status");
+    private void updateStatus(int status){
+        for(ThermalCamStatus s : ThermalCamStatus.values()){
+            if(s.getStatusCode() == status){
+                this.getStatusPanel().updateStatus(s);
+                this.statusLabel.setText(s.getStatusDescription());
+            }
         }
     }
-    
+
     private void updateConnected(boolean connected){
         if(connected == true){
+            if(connectedLabel.getIcon() == YELLOW_LIGHT){
+                askForCurrentSettings();
+            }
             connectedLabel.setIcon(GREEN_LIGHT);
             connectedLabel.setText("Connected");
         }
@@ -259,34 +289,25 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return savedSettings;
     }
  
-    /* (non-Javadoc)
-     * @see no.ntnu.thermalcamcontrol.gui.UseMsgUpdater.MsgUpdater#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
-     */
+    /** Reply Action Interface **/
+    
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-
         if(rec.getFunction() == ThermalCamFunctionCodes.NO_OP.getFunctionCode()){
             updateConnected(true);
-        }
-        else if(rec.getFunction() == ThermalCamFunctionCodes.SERIAL_NUMBER.getFunctionCode()){
-            updateSerialNumber(rec.getArgs());
-        }
-        else if(rec.getFunction() == ThermalCamFunctionCodes.CAMERA_PART_GET.getFunctionCode()){
-            updateCamPartNumber(rec.getArgs());
         }
     }
     
     @Override
     public void executeIfNoReply(ThermalCamControl sent){
-        // check message and send again
+        sendCommand(sent);
     }
-
-    
+  
     /** Panel Access Functions **/
     
     public StatusPanel getStatusPanel(){
         if(statusPanel == null){
-            statusPanel = new StatusPanel();
+            statusPanel = new StatusPanel(this);
         }
         return statusPanel;
     }
@@ -332,14 +353,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
 
     public AGCDDEPanel getAgcDdePanel(){
         if(agcDdePanel == null){
-            agcDdePanel = new AGCDDEPanel();
+            agcDdePanel = new AGCDDEPanel(this);
         }
         return agcDdePanel;
     }
     
     public RoiPanel getRoiPanel(){
         if(roiPanel == null){
-            roiPanel = new RoiPanel();
+            roiPanel = new RoiPanel(this);
         }
         return roiPanel;
     }
@@ -379,6 +400,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             partNumberLabel = new JLabel();
             serialNumberLabel = new JLabel();
             statusLabel = new JLabel();
+            fpaSizeLabel = new JLabel();
             
             bottomPanel.setPreferredSize(new java.awt.Dimension(866, 64));
             connectedLabel.setIcon(RED_LIGHT);
@@ -386,6 +408,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
             partNumberLabel.setText("Part #:");
             serialNumberLabel.setText("Serial #:");
             statusLabel.setText("No status");
+            fpaSizeLabel.setText("FPA size: " + FPA_SIZE);
             
             GroupLayout bottomPanelLayout = new GroupLayout(bottomPanel);
             bottomPanel.setLayout(bottomPanelLayout);
@@ -394,13 +417,17 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
                 .addGroup(GroupLayout.Alignment.TRAILING, bottomPanelLayout.createSequentialGroup()
                     .addGap(52, 52, 52)
                     .addComponent(connectedLabel)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
+                    .addGap(103, 103, 103)
                     .addComponent(statusLabel)
-                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 200, Short.MAX_VALUE)
+                    .addGap(176, 176, 176)
                     .addGroup(bottomPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(serialNumberLabel)
-                        .addComponent(partNumberLabel))
-                    .addGap(225, 225, 225))
+                        .addGroup(bottomPanelLayout.createSequentialGroup()
+                            .addComponent(partNumberLabel)
+                            .addGap(9, 9, 9)))
+                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 160, Short.MAX_VALUE)
+                    .addComponent(fpaSizeLabel)
+                    .addGap(108, 108, 108))
             );
             bottomPanelLayout.setVerticalGroup(
                 bottomPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -408,12 +435,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
                     .addContainerGap()
                     .addGroup(bottomPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(connectedLabel)
+                        .addComponent(partNumberLabel)
                         .addComponent(statusLabel)
-                        .addComponent(partNumberLabel))
+                        .addComponent(fpaSizeLabel))
                     .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(serialNumberLabel)
                     .addContainerGap())
             );
+            
         }
         return bottomPanel;
     }
@@ -442,15 +471,39 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return thermalCamMenuBar;
     }
     
-    protected long twoBytesToLong(byte first, byte second){
-        return (long)((first & 0xFF) << 8) | (second & 0xFF);
+    /** Helper functions for getting and setting ThermalCamControl IMC Message args **/
+    
+    protected long twoBytesToLong(byte[] array){
+        return (long)((array[0] & 0xFF) << 8) | (array[1] & 0xFF);
     }
 
+    protected long fourBytesToLong(byte[] array){
+        return (long)(((array[0] & 0xFF) << 24) 
+                | ((array[1] & 0xFF) << 16) 
+                | ((array[2] & 0xFF) << 8) 
+                | (array[3] & 0xFF));
+    }
+    
     protected byte[] longtoTwoBytes(long arg){
         byte[] ret = new byte[2];
         ret[0] = (byte) (arg & 0xFF);
         ret[1] = (byte) ((arg >> 8) & 0xFF);
         return ret;
+    }
+
+    protected long twoBytesToLong(byte first, byte second){
+        return (long)((first & 0xFF) << 8) | (second & 0xFF);
+    }
+        
+    protected boolean isWithinRange(long min, long max, long value){
+        return ((value < max)&&(value > min));
+    }
+    
+    protected byte[] concatenate(byte[] first, byte[] second){
+        byte[] asOne = new byte[first.length + second.length];
+        System.arraycopy(first, 0, asOne, 0, first.length);
+        System.arraycopy(second, 0, asOne, first.length, second.length);
+        return asOne;
     }
     
     /* (non-Javadoc)

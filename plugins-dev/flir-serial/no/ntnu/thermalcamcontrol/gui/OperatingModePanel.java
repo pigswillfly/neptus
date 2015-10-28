@@ -120,8 +120,6 @@ class OperatingModePanel extends JPanel{
                 .addComponent(operatingModeFrozenRadioButton)
                 .addContainerGap(20, Short.MAX_VALUE))
         );
-
-        operatingModeRealTimeRadioButton.setSelected(true);
     }
     
     protected int getOperatingMode(){

@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
@@ -39,6 +42,8 @@ import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
 import javax.swing.SwingConstants;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
 import pt.lsts.imc.ThermalCamControl;
@@ -53,6 +58,19 @@ class EnhancePanel extends JPanel implements ReplyAction{
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui;
+    private static final long ACE_MIN = -8;
+    private static final long ACE_MAX = 8;
+    private static final long DDE_MIN = 0;
+    private static final long DDE_MAX = 63;
+    private static final long SSO_MIN = 0;
+    private static final long SSO_MAX = 100;
+    
+    // States as known by camera
+    private long ace;
+    private long dde;
+    private long sso;
     
     private JLabel aceLabel = null;
     private JLabel aceMaxLabel = null;
@@ -77,8 +95,9 @@ class EnhancePanel extends JPanel implements ReplyAction{
     private JSlider ssoSlider = null;
     private JTextField ssoTextField = null;
     
-    protected EnhancePanel(){
+    protected EnhancePanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -109,52 +128,101 @@ class EnhancePanel extends JPanel implements ReplyAction{
         
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        enhanceLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         enhanceLabel.setText("Enhancements");
 
         ddeSlider.setMajorTickSpacing(1);
-        ddeSlider.setMaximum(63);
-        ddeSlider.setToolTipText("");
-        ddeSlider.setValue(17);
-
-        ddeMinLabel.setText("1");
-
-        ddeMaxLabel.setText("63");
-
+        ddeSlider.setMaximum((int)DDE_MAX);
+        ddeSlider.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                ddeTextField.setText(String.valueOf(ddeSlider.getValue()));
+                setDdeMessage(ddeSlider.getValue());
+            }
+        });
+        ddeMinLabel.setText(String.valueOf(DDE_MIN));
+        ddeMaxLabel.setText(String.valueOf(DDE_MAX));
         ddeLabel.setText("DDE");
+        ddeTextField.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = DDE_MAX + 1;
+                try {
+                    value = Long.parseLong(aceTextField.getText());
+                } catch(NumberFormatException error){
+                    ddeTextField.setText(String.valueOf(getAce()));
+                }
+                if(gui.isWithinRange(DDE_MIN, DDE_MAX, value)){
+                    setDdeMessage(value);
+                    ddeSlider.setValue((int)value);
+                } else {
+                    ddeTextField.setText(String.valueOf(getAce()));
+                }
+            }
+        });
 
         aceLabel.setText("ACE (Active Contrast Enhancement)");
-
         aceSlider.setMaximum(8);
         aceSlider.setMinimum(-8);
         aceSlider.setToolTipText("");
-        aceSlider.setValue(0);
-
-        aceMinLabel.setText("-8");
-
-        aceMaxLabel.setText("8");
+        aceSlider.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                aceTextField.setText(String.valueOf(aceSlider.getValue()));
+                setAceMessage(aceSlider.getValue());
+            }
+        });
+        aceMinLabel.setText(String.valueOf(ACE_MIN));
+        aceMaxLabel.setText(String.valueOf(ACE_MAX));
+        aceTextField.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = ACE_MAX + 1;
+                try {
+                    value = Long.parseLong(aceTextField.getText());
+                } catch(NumberFormatException error){
+                    aceTextField.setText(String.valueOf(getAce()));
+                    aceSlider.setValue((int)value);
+                }
+                if(gui.isWithinRange(ACE_MIN, ACE_MAX, value)){
+                    setAceMessage(value);
+                } else {
+                    aceTextField.setText(String.valueOf(getAce()));
+                }
+            }
+        });
 
         ssoLabel.setText("SSO (Smart Scene Optimization)");
-
         ssoSlider.setToolTipText("");
-        ssoSlider.setValue(100);
-
-        ssoMinLabel.setText("0");
-
-        ssoMaxLabel.setText("100");
+        ssoSlider.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                ssoTextField.setText(String.valueOf(ssoSlider.getValue()));
+                setSsoMessage(ssoSlider.getValue());
+            }
+        });
+        ssoMinLabel.setText(String.valueOf(SSO_MIN));
+        ssoMaxLabel.setText(String.valueOf(SSO_MAX));
+        ssoTextField.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = SSO_MAX + 1;
+                try {
+                    value = Long.parseLong(ssoTextField.getText());
+                } catch(NumberFormatException error){
+                    ssoTextField.setText(String.valueOf(sso));
+                }
+                if(gui.isWithinRange(SSO_MIN, SSO_MAX, value)){
+                    setSsoMessage(value);
+                    ssoSlider.setValue((int)value);
+                } else {
+                    ssoTextField.setText(String.valueOf(getSso()));
+                }
+            }
+        });
 
         ddeNoteLine1.setFont(new java.awt.Font(null, 0, 10)); // NOI18N
         ddeNoteLine1.setText("NOTE: A DDE value of 17 is neutral and will have no effect. Values 0-16 will soften the image, values");
-
         ddeNoteLine2.setFont(new java.awt.Font(null, 0, 10)); // NOI18N
         ddeNoteLine2.setText("17-39 are normal values for sharpening the image, and values 40-63 are for extreme sharpening and ");
-
         ddeNoteLine3.setFont(new java.awt.Font(null, 0, 10)); // NOI18N
         ddeNoteLine3.setText("are not recommended.");
 
         aceNoteLine1.setFont(new java.awt.Font(null, 0, 10)); // NOI18N
         aceNoteLine1.setText("NOTE: A value of 0 is neutral. Negative values will effectively decrease contrast by making dark regions");
-
         aceNoteLine2.setFont(new java.awt.Font(null, 0, 10)); // NOI18N
         aceNoteLine2.setText("lighter, and positive values will effectively increase contrast by making dark regions darker.");
 
@@ -289,14 +357,82 @@ class EnhancePanel extends JPanel implements ReplyAction{
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }
+    
+    protected void getEnhanceSettings(){
+        ThermalCamControl aceMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.ACE_CORRECT_GET);
+        gui.sendCommand(aceMsg);
+        ThermalCamControl ddeMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DDE_GAIN_GET);
+        gui.sendCommand(ddeMsg);
+        ThermalCamControl ssoMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_SUB_GET);
+        ssoMsg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.AGC_SSO_PERCENT.getArg()));
+        gui.sendCommand(ssoMsg);        
+    }
+    
+    private void setAceMessage(long value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.ACE_CORRECT_SET);
+        msg.setArgs(gui.longtoTwoBytes(value));
+        gui.sendCommand(msg);
+    }
 
+    private void setDdeMessage(long value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DDE_GAIN_SET);
+        msg.setArgs(gui.longtoTwoBytes(value));
+        gui.sendCommand(msg);
+    }
+    
+    private void setSsoMessage(long value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_SUB_SET);
+        byte[] ssoPercentArg = gui.longtoTwoBytes(ThermalCamArguments.AGC_SSO_PERCENT.getArg());
+        byte[] setting = gui.longtoTwoBytes(value);
+        msg.setArgs(gui.concatenate(ssoPercentArg, setting));
+        gui.sendCommand(msg);
+    }
+
+    protected void setAce(long value){
+        this.ace = value;
+        aceSlider.setValue((int)value);
+        aceTextField.setText(String.valueOf(value));
+    }
+    
+    protected long getAce(){
+        return this.ace;
+    }
+    
+    protected void setSso(long value){
+        this.sso = value;
+        ssoSlider.setValue((int)value);
+        ssoTextField.setText(String.valueOf(value));
+    }
+    
+    protected long getSso(){
+        return this.sso;
+    }
+    
+    protected void setDde(long value){
+        this.dde = value;
+        ddeSlider.setValue((int)value);
+        ddeTextField.setText(String.valueOf(value));
+    }
+    
+    protected long getDde(){
+        return this.dde;
+    }
+    
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.ACE_CORRECT_GET.getFunctionCode()){
+            setAce(gui.twoBytesToLong(rec.getArgs()));
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.DDE_GAIN_GET.getFunctionCode()){
+            setDde(gui.twoBytesToLong(rec.getArgs()));
+        } else if ((rec.getFunction() == ThermalCamFunctionCodes.AGC_SUB_GET.getFunctionCode()) 
+                && (gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_SSO_PERCENT.getArg())){
+            if(rec.getByteCount() > 0){
+                setSso(gui.twoBytesToLong(rec.getArgs()));       
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -304,8 +440,7 @@ class EnhancePanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
 
 }

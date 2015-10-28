@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JButton;
@@ -40,6 +43,8 @@ import javax.swing.JPanel;
 import javax.swing.JSlider;
 import javax.swing.JTextField;
 import javax.swing.LayoutStyle;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
 import pt.lsts.imc.ThermalCamControl;
@@ -55,6 +60,16 @@ class ManualParamPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private static final long BRIGHTNESS_MIN = 0;
+    private static final long BRIGHTNESS_MAX = 16383;
+    private static final long CONTRAST_MIN = 0;
+    private static final long CONTRAST_MAX = 255;
+    
+    private ThermalCamControlGui gui;
+    
+    private long contrast;
+    private long brightness;
+    
     private JLabel brightnessLabel = null;
     private JLabel brightnessMaxLabel = null;
     private JLabel brightnessMinLabel = null;
@@ -69,8 +84,9 @@ class ManualParamPanel extends JPanel implements ReplyAction{
     private JLabel manualParamLabel = null;
     private JButton oneShotButton = null;
 
-    protected ManualParamPanel(){
+    protected ManualParamPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -95,30 +111,69 @@ class ManualParamPanel extends JPanel implements ReplyAction{
         manualParamLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         manualParamLabel.setText("Manual Parameters");
 
-        contrastSlider.setMaximum(255);
-        contrastSlider.setToolTipText("");
-        contrastSlider.setValue(32);
-
         contrastLabel.setText("Contrast");
-
-        contrastMinLabel.setText("0");
-
-        contrastMaxLabel.setText("255");
+        contrastSlider.setMinimum((int)CONTRAST_MIN);
+        contrastSlider.setMaximum((int)CONTRAST_MAX);
+        contrastSlider.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                contrastTextField.setText(String.valueOf(contrastSlider.getValue()));
+                setContrastMessage(contrastSlider.getValue());
+            }
+        });
+        contrastMinLabel.setText(String.valueOf(CONTRAST_MIN));
+        contrastMaxLabel.setText(String.valueOf(CONTRAST_MAX));
+        contrastTextField.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = CONTRAST_MAX + 1;
+                try {
+                    value = Long.parseLong(contrastTextField.getText());
+                } catch(NumberFormatException error){
+                    contrastTextField.setText(String.valueOf(getContrast()));
+                }
+                if(gui.isWithinRange(CONTRAST_MIN, CONTRAST_MAX, value)){
+                    setContrastMessage(value);
+                } else {
+                    contrastTextField.setText(String.valueOf(getContrast()));
+                }
+            }
+        });
 
         brightnessLabel.setText("Brightness");
-
-        brightnessSlider.setMaximum(16383);
-        brightnessSlider.setToolTipText("");
-        brightnessSlider.setValue(2959);
-
-        brightnessMinLabel.setText("0");
-
-        brightnessMaxLabel.setText("16383");
+        brightnessSlider.setMinimum((int)BRIGHTNESS_MIN);
+        brightnessSlider.setMaximum((int)BRIGHTNESS_MAX);
+        brightnessSlider.addChangeListener(new ChangeListener(){
+            public void stateChanged(ChangeEvent e) {
+                brightnessTextField.setText(String.valueOf(brightnessSlider.getValue()));
+                setBrightnessMessage(brightnessSlider.getValue());
+            }
+        });
+        brightnessMinLabel.setText(String.valueOf(BRIGHTNESS_MIN));
+        brightnessMaxLabel.setText(String.valueOf(BRIGHTNESS_MAX));
+        brightnessTextField.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                long value = BRIGHTNESS_MAX + 1;
+                try {
+                    value = Long.parseLong(brightnessTextField.getText());
+                } catch(NumberFormatException error){
+                    brightnessTextField.setText(String.valueOf(getBrightness()));
+                }
+                if(gui.isWithinRange(BRIGHTNESS_MIN, BRIGHTNESS_MAX, value)){
+                    setBrightnessMessage(value);
+                } else {
+                    brightnessTextField.setText(String.valueOf(getBrightness()));
+                }
+            }
+        });
 
         fineCheckBox.setFont(new java.awt.Font(null, 0, 12)); // NOI18N
         fineCheckBox.setText("Fine");
 
-        oneShotButton.setText("One-shot");
+        oneShotButton.setText("<html><p>One-shot</p><p>Brightness</p><p>Adjustment</p>");
+        oneShotButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                performOneShotMessage();
+            }
+        });
 
         GroupLayout manualParamPanelLayout = new GroupLayout(this);
         this.setLayout(manualParamPanelLayout);
@@ -194,8 +249,50 @@ class ManualParamPanel extends JPanel implements ReplyAction{
                     .addComponent(fineCheckBox)
                     .addComponent(oneShotButton, GroupLayout.PREFERRED_SIZE, 81, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
-        );
-        
+        );        
+    }
+    
+    protected void getManualParams(){
+        ThermalCamControl brightMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.BRIGHTNESS_BIAS_GET);
+        gui.sendCommand(brightMsg);
+        ThermalCamControl contrastMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.CONTRAST_GET);
+        gui.sendCommand(contrastMsg);
+    }
+    
+    protected void setBrightnessMessage(long value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.BRIGHTNESS_SET);
+        msg.setArgs(gui.longtoTwoBytes(value));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setContrastMessage(long value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.CONTRAST_SET);
+        msg.setArgs(gui.longtoTwoBytes(value));
+        gui.sendCommand(msg);
+    }
+    
+    private void performOneShotMessage(){
+        // finds mean of 14-bit histogram & set as brightness
+    }
+    
+    protected void setBrightness(long value){
+        this.brightness = value;
+        brightnessSlider.setValue((int) value);
+        brightnessTextField.setText(String.valueOf(value));
+    }
+    
+    protected long getBrightness(){
+        return this.brightness;
+    }
+    
+    protected void setContrast(long value){
+        this.contrast = value;
+        contrastSlider.setValue((int)value);
+        contrastTextField.setText(String.valueOf(value));
+    }
+    
+    protected long getContrast(){
+        return this.contrast;
     }
 
     /* (non-Javadoc)
@@ -203,8 +300,11 @@ class ManualParamPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.BRIGHTNESS_GET.getFunctionCode()){
+            setBrightness(gui.twoBytesToLong(rec.getArgs()));
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.CONTRAST_GET.getFunctionCode()){
+            setContrast(gui.twoBytesToLong(rec.getArgs()));
+        }
     }
 
     /* (non-Javadoc)
@@ -212,8 +312,7 @@ class ManualParamPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
 
 }

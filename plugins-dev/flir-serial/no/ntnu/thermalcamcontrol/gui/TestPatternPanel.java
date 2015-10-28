@@ -123,10 +123,19 @@ class TestPatternPanel extends JPanel implements ReplyAction {
         );
     }
     
+    protected void getTestPatternMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.TEST_PATTERN_GET);
+        gui.sendCommand(msg);
+    }
+    
     private void setTestPatternMessage(long pattern){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.TEST_PATTERN_SET);
         msg.setArgs(gui.longtoTwoBytes(pattern));
         gui.sendCommand(msg);
+    }
+    
+    protected long getTestPattern(){
+        return this.testPattern;
     }
     
     protected void setTestPattern(long pattern){
@@ -139,9 +148,7 @@ class TestPatternPanel extends JPanel implements ReplyAction {
         } 
     }
     
-    protected long getTestPattern(){
-        return this.testPattern;
-    }
+
 
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
@@ -149,7 +156,7 @@ class TestPatternPanel extends JPanel implements ReplyAction {
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(rec.getFunction() == ThermalCamFunctionCodes.TEST_PATTERN_GET.getFunctionCode()){
-            setTestPattern(gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]));
+            setTestPattern(gui.twoBytesToLong(rec.getArgs()));
         }
     }
 

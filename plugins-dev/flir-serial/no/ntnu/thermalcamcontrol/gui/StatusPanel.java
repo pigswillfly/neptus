@@ -31,6 +31,8 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.util.Arrays;
+
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
@@ -50,8 +52,20 @@ class StatusPanel extends JPanel implements ReplyAction{
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui;
+    
+    private long cameraSerialNumber;
+    private long sensorSerialNumber;
+    private long swMajor;
+    private long swMinor;
+    private long fwMajor;
+    private long fwMinor;
+    private String partNumber;
+    private ThermalCamStatus status;
+    private long fpaTemp;
 
-    private JLabel StatusLabel = null;
+    private JLabel statusLabel = null;
     private JLabel fpaTempLabel = null;
     private JLabel line10Label = null;
     private JLabel line11Label = null;
@@ -68,18 +82,19 @@ class StatusPanel extends JPanel implements ReplyAction{
     private JLabel line9Label = null;
     private JLabel partNumberLabel = null;
     private JLabel serialNumberLabel = null;
-    private JLabel systemStatusLabel = null;
+    private JLabel systemstatusLabel = null;
     private JPanel systemStatusPanel = null;
     
-    protected StatusPanel(){
+    protected StatusPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
     private void initialize(){
         systemStatusPanel = new JPanel();
-        systemStatusLabel = new JLabel();
-        StatusLabel = new JLabel();
+        systemstatusLabel = new JLabel();
+        statusLabel = new JLabel();
         line1Label = new JLabel();
         line2Label = new JLabel();
         line3Label = new JLabel();
@@ -99,10 +114,10 @@ class StatusPanel extends JPanel implements ReplyAction{
 
         systemStatusPanel.setBorder(BorderFactory.createEtchedBorder());
 
-        systemStatusLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        systemStatusLabel.setText("System Status");
+        systemstatusLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        systemstatusLabel.setText("System Status");
 
-        StatusLabel.setText("Ready.");
+        statusLabel.setText("Ready.");
 
         GroupLayout systemStatusPanelLayout = new GroupLayout(systemStatusPanel);
         systemStatusPanel.setLayout(systemStatusPanelLayout);
@@ -111,8 +126,8 @@ class StatusPanel extends JPanel implements ReplyAction{
             .addGroup(systemStatusPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(systemStatusPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(systemStatusLabel)
-                    .addComponent(StatusLabel)
+                    .addComponent(systemstatusLabel)
+                    .addComponent(statusLabel)
                     .addComponent(line1Label)
                     .addComponent(line2Label)
                     .addComponent(line3Label)
@@ -132,9 +147,9 @@ class StatusPanel extends JPanel implements ReplyAction{
             systemStatusPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(systemStatusPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(systemStatusLabel)
+                .addComponent(systemstatusLabel)
                 .addGap(18, 18, 18)
-                .addComponent(StatusLabel)
+                .addComponent(statusLabel)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(line1Label)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
@@ -200,14 +215,62 @@ class StatusPanel extends JPanel implements ReplyAction{
                 .addContainerGap(102, Short.MAX_VALUE))
         );
     }
+    
+    protected void getNumbers(){
+        ThermalCamControl partNumMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.CAMERA_PART_GET);
+        gui.sendCommand(partNumMsg);
+        ThermalCamControl serialNumMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.SERIAL_NUMBER);
+        gui.sendCommand(serialNumMsg);
+        // fpaTemp: READ_SENSOR functioncode, READ_SENSOR_FPA_TEMP_DEGCx10 argument
+    }
+    
+    protected void setPartNumber(String num){
+        this.partNumber = num;
+        partNumberLabel.setText("Part Number: " + num);
+    }
+    
+    protected String getPartNumber(){
+        return this.partNumber;
+    }
+    
+    protected void setCameraSerialNumber(long num){
+        this.cameraSerialNumber = num;
+        serialNumberLabel.setText("Serial Number: " + String.valueOf(num));
+    }
+    
+    protected long getCameraSerialNumber(){
+        return this.cameraSerialNumber;
+    }
+    
+    protected void setSensorSerialNumber(long num){
+        this.sensorSerialNumber = num;
+    }
+    
+    protected long getSensorSerialNumber(){
+        return this.sensorSerialNumber;
+    }
+    
+    protected void updateStatus(ThermalCamStatus status){
+            this.status = status;
+            statusLabel.setText(status.getStatusDescription());
+    }
+    
+    protected ThermalCamStatus getStatus(){
+        return this.status;
+    }
 
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.SERIAL_NUMBER.getFunctionCode()){
+            byte[] args = rec.getArgs();
+            setCameraSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 0, 3)));
+            setSensorSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 4, 7)));
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.CAMERA_PART_GET.getFunctionCode()){
+            setPartNumber(rec.getArgs().toString());
+        }
     }
 
     /* (non-Javadoc)
@@ -215,7 +278,6 @@ class StatusPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
 }

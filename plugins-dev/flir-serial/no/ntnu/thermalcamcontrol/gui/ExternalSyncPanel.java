@@ -87,21 +87,21 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
         externalSyncSlaveRadioButton.setText("Slave");
         externalSyncSlaveRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_SLAVE.getArg());
+                setExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_SLAVE.getArg());
             }
         });
 
         externalSyncMasterRadioButton.setText("Master");
         externalSyncMasterRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_MASTER.getArg());
+                setExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_MASTER.getArg());
             }
         });
         
         externalSyncDisableRadioButton.setText("Disable");
         externalSyncDisableRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                sendExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_DISABLED.getArg());
+                setExternalSyncMessage(ThermalCamArguments.EXTERNAL_SYNC_DISABLED.getArg());
             }
         });
 
@@ -134,13 +134,16 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
                 .addComponent(externalSyncMasterRadioButton)
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        externalSyncDisableRadioButton.setSelected(true);
     }
 
-    private void sendExternalSyncMessage(long setting){
+    private void setExternalSyncMessage(long setting){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.EXTERNAL_SYNC_GET);
         msg.setArgs(gui.longtoTwoBytes(setting));
+        gui.sendCommand(msg);
+    }
+    
+    protected void getExternalSyncMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.EXTERNAL_SYNC_GET);
         gui.sendCommand(msg);
     }
     
@@ -167,7 +170,7 @@ class ExternalSyncPanel extends JPanel implements ReplyAction{
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(rec.getFunction() == ThermalCamFunctionCodes.EXTERNAL_SYNC_GET.getFunctionCode()){
-            setExternalSync(gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]));
+            setExternalSync(gui.twoBytesToLong(rec.getArgs()));
         }
     }
 

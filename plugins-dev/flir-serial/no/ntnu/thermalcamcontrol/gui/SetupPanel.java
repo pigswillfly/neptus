@@ -131,7 +131,7 @@ class SetupPanel extends JPanel implements ReplyAction{
     protected ExternalSyncPanel getExternalSyncPanel(){
         
         if(externalSyncPanel == null)
-            externalSyncPanel = new ExternalSyncPanel();
+            externalSyncPanel = new ExternalSyncPanel(this.gui);
         return externalSyncPanel;
     }
     

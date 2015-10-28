@@ -314,7 +314,7 @@ class FfcPanel extends JPanel implements ReplyAction{
         );
     }
     
-    protected void askForSettings(){
+    protected void getFFCSettingsMessage(){
         ThermalCamControl modeMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_MODE_SELECT_GET);
         gui.sendCommand(modeMsg);
         ThermalCamControl tempDeltaMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET);
@@ -427,6 +427,7 @@ class FfcPanel extends JPanel implements ReplyAction{
     private boolean isCurrentGainLow(){
         return (gui.getSetupPanel().getGainModePanel().getGainMode() == ThermalCamArguments.GAIN_MODE_LOW.getArg());
     }
+    
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
@@ -465,7 +466,7 @@ class FfcPanel extends JPanel implements ReplyAction{
             // check status
         } else if (function == ThermalCamFunctionCodes.FFC_PERIOD_GET.getFunctionCode()){
             if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_SET.getReplyByteCount()){
-                long ffcPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                long ffcPeriod = gui.twoBytesToLong(rec.getArgs());
                 setFFCPeriod(ffcPeriod, isCurrentGainLow());
             } else if (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getReplyByteCount()){
                 long lowGainPeriod = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);

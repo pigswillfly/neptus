@@ -45,12 +45,15 @@ class AGCDDEPanel extends JPanel {
      */
     private static final long serialVersionUID = 1L;
     
-    JPanel manualParamPanel = null;
-    JPanel agcModesPanel = null;
-    JPanel enhancePanel = null;
+    private ThermalCamControlGui gui;
     
-    protected AGCDDEPanel(){
+    private ManualParamPanel manualParamPanel = null;
+    private AgcPanel agcModesPanel = null;
+    private EnhancePanel enhancePanel = null;
+    
+    protected AGCDDEPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -83,23 +86,23 @@ class AGCDDEPanel extends JPanel {
         );
     }
     
-    protected JPanel getEnhancePanel(){
+    protected EnhancePanel getEnhancePanel(){
         if(enhancePanel == null){
-            enhancePanel = new EnhancePanel();
+            enhancePanel = new EnhancePanel(this.gui);
         }
         return enhancePanel;
     }
     
-    protected JPanel getManualParamPanel(){
+    protected ManualParamPanel getManualParamPanel(){
         if(manualParamPanel == null){
-            manualParamPanel = new ManualParamPanel();
+            manualParamPanel = new ManualParamPanel(this.gui);
         }
         return manualParamPanel;
     }
     
-    protected JPanel getAgcModesPanel(){
+    protected AgcPanel getAgcModesPanel(){
         if(agcModesPanel == null){
-            agcModesPanel = new AgcPanel();
+            agcModesPanel = new AgcPanel(this.gui);
         }
         return agcModesPanel;
     }

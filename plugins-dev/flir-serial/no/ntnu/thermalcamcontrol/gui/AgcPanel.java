@@ -31,8 +31,11 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -55,6 +58,20 @@ public class AgcPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private static final long[] DEFAULT = {0, 0};
+    private static final long[] SKY_SEA = {0, 0};
+    private static final long[] INDOORS = {0, 0};
+    private static final long[] OUTDOORS = {0, 0};
+    private static final long[] FACE_DEF = {0, 0};
+    private static final String[] NOT_ON_AUTO = {""};
+    private static final String[] AGC_AUTO_PRESETS = {"Default", "Sky/Sea", "Indoors", "Outdoors", "Face Definition"};
+    private static final long[] AGC_AUTO_CONTRAST = {DEFAULT[0], SKY_SEA[0], INDOORS[0], OUTDOORS[0], FACE_DEF[0]};
+    private static final long[] AGC_AUTO_BRIGHTNESS = {DEFAULT[1], SKY_SEA[1], INDOORS[1], OUTDOORS[1], FACE_DEF[1]};
+    
+    private ThermalCamControlGui gui;
+    
+    private long agcMode;
+    
     // Variables declaration - do not modify                     
     private JComboBox<String> agcAutoPresetsComboBox;
     private JLabel agcAutoPresetsLabel;
@@ -64,8 +81,9 @@ public class AgcPanel extends JPanel implements ReplyAction{
     private ButtonGroup agcModesButtonGroup;
     private JLabel agcModesLabel;
 
-    protected AgcPanel(){
+    protected AgcPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -89,11 +107,37 @@ public class AgcPanel extends JPanel implements ReplyAction{
         agcModesLabel.setText("AGC Modes");
 
         agcModeManualRadioButton.setText("Manual");
+        agcModeManualRadioButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                setAgcModeMessage(ThermalCamArguments.AGC_MODE_MANUAL.getArg());
+                agcAutoPresetsComboBox.setModel(new DefaultComboBoxModel<String>(NOT_ON_AUTO));
+            }
+        });
         agcModeLinearRadioButton.setText("Linear");
+        agcModeLinearRadioButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                setAgcModeMessage(ThermalCamArguments.AGC_MODE_LINEAR.getArg());
+                agcAutoPresetsComboBox.setModel(new DefaultComboBoxModel<String>(NOT_ON_AUTO));
+            }
+        });
         agcModeAutoRadioButton.setText("Auto");
+        agcModeAutoRadioButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                setAgcModeMessage(ThermalCamArguments.AGC_MODE_AUTO_BRIGHT.getArg());
+                agcAutoPresetsComboBox.setModel(new DefaultComboBoxModel<String>(AGC_AUTO_PRESETS));
+            }
+        });       
 
         agcAutoPresetsLabel.setText("Auto presets");
-
+        agcAutoPresetsComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if(getAgcMode() == ThermalCamArguments.AGC_MODE_AUTO_BRIGHT.getArg()){
+                    invokeAgcAutoPresets(agcAutoPresetsComboBox.getSelectedIndex());
+                }
+            }
+        });
+        
+        
         GroupLayout agcModesPanelLayout = new GroupLayout(this);
         this.setLayout(agcModesPanelLayout);
         agcModesPanelLayout.setHorizontalGroup(
@@ -138,14 +182,68 @@ public class AgcPanel extends JPanel implements ReplyAction{
         );
 
     }
+    
+    protected long getAgcMode(){
+        return this.agcMode;
+    }
+    
+    protected void setAgcMode(long mode){
+        if(mode == ThermalCamArguments.AGC_MODE_AUTO_BRIGHT.getArg()){
+            this.agcMode = mode;
+            agcModeAutoRadioButton.setSelected(true);
+        } else if (mode == ThermalCamArguments.AGC_MODE_MANUAL.getArg()){
+            this.agcMode = mode;
+            agcModeManualRadioButton.setSelected(true);
+        } else if (mode == ThermalCamArguments.AGC_MODE_LINEAR.getArg()){
+            this.agcMode = mode;
+            agcModeLinearRadioButton.setSelected(true);
+        } else {
+            agcModeLinearRadioButton.setSelected(false);
+            agcModeAutoRadioButton.setSelected(false);
+            agcModeManualRadioButton.setSelected(false);
+        }
+    }
+    
+    private void setAgcModeMessage(long mode){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_TYPE_SET);
+        msg.setArgs(gui.longtoTwoBytes(mode));
+        gui.sendCommand(msg);
+    }
+    
+    protected void getAgcModeMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_TYPE_GET);
+        gui.sendCommand(msg);
+    }
+    
+    private void invokeAgcAutoPresets(int index){
+        gui.getAgcDdePanel().getManualParamPanel().setContrastMessage(AGC_AUTO_CONTRAST[index]);
+        gui.getAgcDdePanel().getManualParamPanel().setBrightnessMessage(AGC_AUTO_BRIGHTNESS[index]);
+    }
 
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.AGC_TYPE_GET.getFunctionCode()){
+            if((sent.getByteCount() == 0) || (sent.getArgs()[0] == 0x00)){
+                // agc mode set or get
+                setAgcMode(gui.twoBytesToLong(rec.getArgs()));
+            } else if (gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_SSO_PERCENT.getArg()){
+                if(rec.getByteCount() > 0){
+                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(rec.getArgs()));
+                } else {
+                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(sent.getArgs()[2], sent.getArgs()[3]));
+                }
+            } else if ((gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_INFO_THRESHOLD.getArg())
+                    && (rec.getByteCount() > 0)){
+                if(rec.getByteCount() > 0){
+                    //setAgcInfoThreshold(gui.twoBytesToLong(rec.getArgs()));
+                } else {
+                    //setAgcInfoThreshold(gui.twoBytesToLong(sent.getArgs()[2], sent.getArgs()[3]));
+                }
+            }
+        }
     }
 
     /* (non-Javadoc)
@@ -153,8 +251,6 @@ public class AgcPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
-
 }
