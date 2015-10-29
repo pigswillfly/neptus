@@ -33,6 +33,7 @@ package no.ntnu.thermalcamcontrol.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -469,18 +470,18 @@ class FfcPanel extends JPanel implements ReplyAction{
                 long ffcPeriod = gui.twoBytesToLong(rec.getArgs());
                 setFFCPeriod(ffcPeriod, isCurrentGainLow());
             } else if (rec.getByteCount() == ThermalCamFunctionCodes.FFC_PERIOD_GET.getReplyByteCount()){
-                long lowGainPeriod = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
-                long highGainPeriod = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                long lowGainPeriod = gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 0, 2));
+                long highGainPeriod = gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4));
                 setFFCPeriod(lowGainPeriod, true);
                 setFFCPeriod(highGainPeriod, false);
             } 
         } else if (function == ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET.getFunctionCode()){
             if(rec.getByteCount() == ThermalCamFunctionCodes.FFC_TEMP_DELTA_SET.getReplyByteCount()){
-                long tempDelta = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                long tempDelta = gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4));
                 setFFCTempDelta(tempDelta, isCurrentGainLow());
             } else if (rec.getByteCount() == ThermalCamFunctionCodes.FFC_TEMP_DELTA_GET.getReplyByteCount()){
-                long lowGainTempDelta = gui.twoBytesToLong(rec.getArgs()[0], rec.getArgs()[1]);
-                long highGainTempDelta = gui.twoBytesToLong(rec.getArgs()[2], rec.getArgs()[3]);
+                long lowGainTempDelta = gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 0, 2));
+                long highGainTempDelta = gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4));
                 setFFCTempDelta(lowGainTempDelta, true);
                 setFFCTempDelta(highGainTempDelta, false);
             } 

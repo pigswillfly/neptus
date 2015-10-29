@@ -42,6 +42,8 @@ import javax.swing.JLabel;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle;
 
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
+
 import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
 import pt.lsts.imc.ThermalCamControl;
 
@@ -233,7 +235,7 @@ public class AgcPanel extends JPanel implements ReplyAction{
                 if(rec.getByteCount() > 0){
                     gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(rec.getArgs()));
                 } else {
-                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(sent.getArgs()[2], sent.getArgs()[3]));
+                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4)));
                 }
             } else if ((gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_INFO_THRESHOLD.getArg())
                     && (rec.getByteCount() > 0)){
