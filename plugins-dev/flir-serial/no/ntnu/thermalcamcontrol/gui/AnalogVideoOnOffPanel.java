@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -39,16 +42,23 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class AnalogVideoOnOffPanel extends JPanel {
+class AnalogVideoOnOffPanel extends JPanel implements ReplyAction{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui;
+    
+    private boolean analogVideoOn;
     
     private JRadioButton analogVideoOnRadioButton = null;
     private JRadioButton analogVideoOffRadioButton = null;
@@ -72,8 +82,18 @@ class AnalogVideoOnOffPanel extends JPanel {
         this.setBorder(BorderFactory.createEtchedBorder());
 
         analogVideoOnRadioButton.setText("On");
+        analogVideoOnRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setAnalogVideoOnOffMessage(true);
+            }
+        });
 
         analogVideoOffRadioButton.setText("Off");
+        analogVideoOffRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setVideoModeMessage(false);
+            }
+        });
 
         analogVideoOnOffLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         analogVideoOnOffLabel.setText("Video On / Off");
@@ -104,13 +124,62 @@ class AnalogVideoOnOffPanel extends JPanel {
                 .addComponent(analogVideoOffRadioButton)
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
-
-        askForCurrentSetting();
+    }
+    
+    protected void getVideoModeMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_MODE_GET);
+        gui.sendCommand(msg);
+    }
+    
+    protected void setVideoModeMessage(boolean videoOff, boolean frozen){
+        long videoOnArg = 0, videoFrozenArg = 0;
+        if(videoOff)
+            videoOnArg = ThermalCamArguments.ANALOG_VIDEO_OFF.getArg();
+        if(frozen)
+            videoFrozenArg = ThermalCamArguments.VIDEO_MODE_FREEZE.getArg();
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_MODE_SET);
+        msg.setArgs(gui.longtoTwoBytes(videoOnArg | videoFrozenArg));
+        gui.sendCommand(msg);
+    }
+    
+    protected boolean isAnalogVideoEnabled(){
+        return this.analogVideoOn;
+    }
+    
+    protected void enableAnalogVideo(boolean enable){
+        this.analogVideoOn = true;
+        if(enable){
+            analogVideoOnRadioButton.setSelected(true);
+        } else {
+            analogVideoOffRadioButton.setSelected(true);
+        }
+    }
+    
+    protected void operatingModeChange(boolean frozen){
+        setVideoModeMessage(analogVideoOnRadioButton.isSelected(), frozen);
     }
 
-    private void askForCurrentSetting(){
-        // send message to find out current setting
-        analogVideoOnRadioButton.setSelected(true);
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.VIDEO_MODE_GET.getFunctionCode()){
+            long arg = gui.twoBytesToLong(rec.getArgs());
+            enableAnalogVideo((arg & ThermalCamArguments.ANALOG_VIDEO_ON_OFF_MASK.getArg()) == ThermalCamArguments.ANALOG_VIDEO_ON.getArg());
+            gui.getSetupPanel().getOperatingModePanel().freeze(
+                    (arg & ThermalCamArguments.VIDEO_MODE_MASK.getArg()) == ThermalCamArguments.VIDEO_MODE_FREEZE.getArg());
+            // symbol overlay functionality?
+        }
     }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
+    }
+
     
 }

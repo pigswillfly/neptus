@@ -56,7 +56,7 @@ class OperatingModePanel extends JPanel{
     @SuppressWarnings("unused")
     private ThermalCamControlGui gui;
     
-    private int operatingMode;
+    private boolean frozen;
     
     private JLabel operatingModeLabel = null;
     private JRadioButton operatingModeRealTimeRadioButton = null;
@@ -86,14 +86,14 @@ class OperatingModePanel extends JPanel{
         operatingModeRealTimeRadioButton.setText("Real Time");
         operatingModeRealTimeRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                // notify video panel?
+                gui.getAnalogPanel().getAnalogVideoOnOffPanel().operatingModeChange(true);
             }
         });
 
         operatingModeFrozenRadioButton.setText("Frozen");
         operatingModeRealTimeRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                // notify video panel?
+                gui.getAnalogPanel().getAnalogVideoOnOffPanel().operatingModeChange(false);
             }
         });
 
@@ -122,16 +122,12 @@ class OperatingModePanel extends JPanel{
         );
     }
     
-    protected int getOperatingMode(){
-        return operatingMode;
+    protected boolean isFrozen(){
+        return this.frozen;
     }
     
-    protected void setOperatingMode(int mode){
-        if(mode == ThermalCamArguments.VIDEO_MODE_REAL_TIME.getArg()){
-            this.operatingMode = mode;
-        } else if (mode == ThermalCamArguments.VIDEO_MODE_FREEZE.getArg()){
-            this.operatingMode = mode;
-        }
+    protected void freeze(boolean freeze){
+        this.frozen = freeze;
     }
 
 }
