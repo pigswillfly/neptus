@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JCheckBox;
@@ -38,23 +41,32 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.LayoutStyle;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class OrientationPanel extends JPanel {
+class OrientationPanel extends JPanel implements ReplyAction {
     
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     
+    private ThermalCamControlGui gui;
+    
+    private boolean invert;
+    private boolean revert;
+    
     private JCheckBox orientationInvertCheckBox = null;
     private JCheckBox orientationRevertCheckBox = null;
     private JLabel orientationLabel = null;
 
-    protected OrientationPanel(){
+    protected OrientationPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -65,26 +77,36 @@ class OrientationPanel extends JPanel {
 
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        orientationInvertCheckBox.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
-        orientationInvertCheckBox.setText("Invert (Flip the image vertically)");
-
-        orientationRevertCheckBox.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
-        orientationRevertCheckBox.setText("Revert (Flip the image horizontally)");
-
-        orientationLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         orientationLabel.setText("Orientation");
+        
+        orientationInvertCheckBox.setText("Invert (Flip the image vertically)");
+        orientationInvertCheckBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setInvertRevertMessage(orientationInvertCheckBox.isSelected(), getRevert());
+            }
+        });
+        orientationRevertCheckBox.setText("Revert (Flip the image horizontally)");
+        orientationRevertCheckBox.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setInvertRevertMessage(getInvert(), orientationRevertCheckBox.isSelected());
+            }
+        });
 
         GroupLayout orientationPanelLayout = new GroupLayout(this);
         this.setLayout(orientationPanelLayout);
         orientationPanelLayout.setHorizontalGroup(
             orientationPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(orientationPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(orientationPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(orientationLabel)
-                    .addComponent(orientationRevertCheckBox)
-                    .addComponent(orientationInvertCheckBox))
-                .addContainerGap(44, Short.MAX_VALUE))
+                    .addGroup(orientationPanelLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(orientationLabel))
+                    .addGroup(orientationPanelLayout.createSequentialGroup()
+                        .addGap(42, 42, 42)
+                        .addGroup(orientationPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(orientationInvertCheckBox)
+                            .addComponent(orientationRevertCheckBox))))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         orientationPanelLayout.setVerticalGroup(
             orientationPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -93,10 +115,62 @@ class OrientationPanel extends JPanel {
                 .addComponent(orientationLabel)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(orientationInvertCheckBox)
-                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
+                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(orientationRevertCheckBox)
                 .addContainerGap())
         );
+    }
+    
+    protected void getInvertRevertMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_ORIENTATION_GET);
+        gui.sendCommand(msg);
+    }
+
+    private void setInvertRevertMessage(boolean invert, boolean revert){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_ORIENTATION_SET);
+        long arg = ThermalCamArguments.VIDEO_ORIENTATION_NORMAL.getArg();
+        if(invert)
+            arg |= ThermalCamArguments.VIDEO_ORIENTATION_INVERT.getArg();
+        if(revert)
+            arg |= ThermalCamArguments.VIDEO_ORIENTATION_REVERT.getArg();
+        msg.setArgs(gui.longtoTwoBytes(arg));
+        gui.sendCommand(msg);
+    }
+    
+    protected boolean getInvert(){
+        return this.invert;
+    }
+    
+    protected void setInvert(boolean invert){
+        this.invert = invert;
+    }
+    
+    protected boolean getRevert(){
+        return this.revert;
+    }
+    
+    protected void setRevert(boolean revert){
+        this.revert = revert;
+    }
+    
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.VIDEO_ORIENTATION_GET.getFunctionCode()){
+            long arg = gui.twoBytesToLong(rec.getArgs());
+            setInvert((arg & ThermalCamArguments.VIDEO_ORIENTATION_INVERT.getArg()) == ThermalCamArguments.VIDEO_ORIENTATION_INVERT.getArg());
+            setRevert((arg & ThermalCamArguments.VIDEO_ORIENTATION_REVERT.getArg()) == ThermalCamArguments.VIDEO_ORIENTATION_REVERT.getArg());
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
     }  
 
 }
