@@ -151,32 +151,24 @@ class PanZoomPanel extends JPanel implements ReplyAction{
         unzoomRadioButton.setText("Unzoom"); 
         unzoomRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setZoomMessage(0);
-                eZoomText.setText("0");
                 eZoomSlider.setValue(0);
             }
         });
         zoom2xRadioButton.setText("Zoom 2x");
         zoom2xRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setZoomMessage(2);
-                eZoomText.setText("2");
                 eZoomSlider.setValue(2);
             }
         });
         zoom4xRadioButton.setText("Zoom 4x");
         zoom4xRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setZoomMessage(4);
-                eZoomText.setText("4");
                 eZoomSlider.setValue(4);
             }
         });
         zoom8xRadioButton.setText("Zoom 8x");
         zoom8xRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setZoomMessage(8);
-                eZoomText.setText("8");
                 eZoomSlider.setValue(8);
             }
         });
@@ -191,9 +183,7 @@ class PanZoomPanel extends JPanel implements ReplyAction{
                     eZoomText.setText(String.valueOf(eZoomSlider.getValue()));
                 }
                 if(gui.isWithinRange(ZOOM_MIN, ZOOM_MAX, value)){
-                    setZoomMessage(value);
                     eZoomSlider.setValue(value);
-                    setZoomRadioButtons(value);
                 } else {
                     eZoomText.setText(String.valueOf(eZoomSlider.getValue()));
                 }
@@ -385,10 +375,7 @@ class PanZoomPanel extends JPanel implements ReplyAction{
             incZoomButton.addActionListener(new ActionListener(){
                 public void actionPerformed(ActionEvent e) {
                     if(eZoomSlider.getValue() < ZOOM_MAX){
-                        int nextSliderVal = eZoomSlider.getValue() + 1;
-                        eZoomSlider.setValue(nextSliderVal);
-                        eZoomText.setText(String.valueOf(nextSliderVal));
-                        setZoomRadioButtons(nextSliderVal);  
+                        eZoomSlider.setValue(eZoomSlider.getValue() + 1);  
                     }
                 }
             });
@@ -475,7 +462,6 @@ class PanZoomPanel extends JPanel implements ReplyAction{
                         panText.setText(String.valueOf(getPan()));
                     }
                     if(gui.isWithinRange(ZOOM_MIN, ZOOM_MAX, value)){
-                        setPanTiltMessage(value, tiltSlider.getValue());
                         panSlider.setValue(value);
                     } else {
                         panText.setText(String.valueOf(getPan()));
@@ -489,13 +475,12 @@ class PanZoomPanel extends JPanel implements ReplyAction{
                     try {
                         value = Integer.parseInt(panText.getText());
                     } catch(NumberFormatException error){
-                        panText.setText(String.valueOf(getPan()));
+                        tiltText.setText(String.valueOf(tiltSlider.getValue()));
                     }
                     if(gui.isWithinRange(ZOOM_MIN, ZOOM_MAX, value)){
-                        setPanTiltMessage(value, tiltSlider.getValue());
-                        panSlider.setValue(value);
+                        tiltSlider.setValue(value);
                     } else {
-                        panText.setText(String.valueOf(getPan()));
+                        tiltText.setText(String.valueOf(tiltSlider.getValue()));
                     }
                 }
             });

@@ -82,13 +82,13 @@ class OrientationPanel extends JPanel implements ReplyAction {
         orientationInvertCheckBox.setText("Invert (Flip the image vertically)");
         orientationInvertCheckBox.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setInvertRevertMessage(orientationInvertCheckBox.isSelected(), getRevert());
+                setOrientationMessage(orientationInvertCheckBox.isSelected(), getRevert());
             }
         });
         orientationRevertCheckBox.setText("Revert (Flip the image horizontally)");
         orientationRevertCheckBox.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setInvertRevertMessage(getInvert(), orientationRevertCheckBox.isSelected());
+                setOrientationMessage(getInvert(), orientationRevertCheckBox.isSelected());
             }
         });
 
@@ -121,12 +121,12 @@ class OrientationPanel extends JPanel implements ReplyAction {
         );
     }
     
-    protected void getInvertRevertMessage(){
+    protected void getOrientationMessage(){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_ORIENTATION_GET);
         gui.sendCommand(msg);
     }
 
-    private void setInvertRevertMessage(boolean invert, boolean revert){
+    private void setOrientationMessage(boolean invert, boolean revert){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_ORIENTATION_SET);
         long arg = ThermalCamArguments.VIDEO_ORIENTATION_NORMAL.getArg();
         if(invert)
