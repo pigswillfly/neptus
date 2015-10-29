@@ -33,6 +33,7 @@ package no.ntnu.thermalcamcontrol.gui;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
@@ -351,6 +352,11 @@ class RoiPanel extends JPanel implements ReplyAction {
         //
     }
     
+    protected void getRoiCoordinatesMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_ROI_GET);
+        gui.sendCommand(msg);
+    }
+    
     private void setRoiCoordinatesMessage(){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_ROI_SET);
         byte[] leftTop = gui.concatenate(gui.longtoTwoBytes(currentLeft), gui.longtoTwoBytes(currentTop));
@@ -411,10 +417,10 @@ class RoiPanel extends JPanel implements ReplyAction {
                 args = rec.getArgs();
             }
             setCoordinates(false, 
-                    gui.twoBytesToLong(args[0], args[1]),
-                    gui.twoBytesToLong(args[2], args[3]),
-                    gui.twoBytesToLong(args[4], args[5]),
-                    gui.twoBytesToLong(args[6], args[7]));
+                    gui.twoBytesToLong(Arrays.copyOfRange(args, 0, 2)),
+                    gui.twoBytesToLong(Arrays.copyOfRange(args, 2, 4)),
+                    gui.twoBytesToLong(Arrays.copyOfRange(args, 4, 6)),
+                    gui.twoBytesToLong(Arrays.copyOfRange(args, 6, 8)));
         }
     }
 
@@ -423,8 +429,7 @@ class RoiPanel extends JPanel implements ReplyAction {
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
 
 }
