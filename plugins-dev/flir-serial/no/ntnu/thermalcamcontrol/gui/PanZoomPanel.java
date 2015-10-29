@@ -671,8 +671,7 @@ class PanZoomPanel extends JPanel implements ReplyAction{
      */
     @Override
     public void executeIfNoReply(ThermalCamControl sent) {
-        // TODO Auto-generated method stub
-        
+        gui.sendCommand(sent);
     }
 }
 

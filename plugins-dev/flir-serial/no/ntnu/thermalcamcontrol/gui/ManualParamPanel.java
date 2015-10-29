@@ -60,10 +60,10 @@ class ManualParamPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
-    private static final long BRIGHTNESS_MIN = 0;
-    private static final long BRIGHTNESS_MAX = 16383;
-    private static final long CONTRAST_MIN = 0;
-    private static final long CONTRAST_MAX = 255;
+    private static final int BRIGHTNESS_MIN = 0;
+    private static final int BRIGHTNESS_MAX = 16383;
+    private static final int CONTRAST_MIN = 0;
+    private static final int CONTRAST_MAX = 255;
     
     private ThermalCamControlGui gui;
     
@@ -124,14 +124,14 @@ class ManualParamPanel extends JPanel implements ReplyAction{
         contrastMaxLabel.setText(String.valueOf(CONTRAST_MAX));
         contrastTextField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                long value = CONTRAST_MAX + 1;
+                int value = CONTRAST_MAX + 1;
                 try {
-                    value = Long.parseLong(contrastTextField.getText());
+                    value = Integer.parseInt(contrastTextField.getText());
                 } catch(NumberFormatException error){
                     contrastTextField.setText(String.valueOf(getContrast()));
                 }
                 if(gui.isWithinRange(CONTRAST_MIN, CONTRAST_MAX, value)){
-                    setContrastMessage(value);
+                    contrastSlider.setValue(value);
                 } else {
                     contrastTextField.setText(String.valueOf(getContrast()));
                 }
@@ -151,14 +151,14 @@ class ManualParamPanel extends JPanel implements ReplyAction{
         brightnessMaxLabel.setText(String.valueOf(BRIGHTNESS_MAX));
         brightnessTextField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                long value = BRIGHTNESS_MAX + 1;
+                int value = BRIGHTNESS_MAX + 1;
                 try {
-                    value = Long.parseLong(brightnessTextField.getText());
+                    value = Integer.parseInt(brightnessTextField.getText());
                 } catch(NumberFormatException error){
                     brightnessTextField.setText(String.valueOf(getBrightness()));
                 }
                 if(gui.isWithinRange(BRIGHTNESS_MIN, BRIGHTNESS_MAX, value)){
-                    setBrightnessMessage(value);
+                    brightnessSlider.setValue(value);
                 } else {
                     brightnessTextField.setText(String.valueOf(getBrightness()));
                 }

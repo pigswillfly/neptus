@@ -60,17 +60,17 @@ class EnhancePanel extends JPanel implements ReplyAction{
     private static final long serialVersionUID = 1L;
     
     private ThermalCamControlGui gui;
-    private static final long ACE_MIN = -8;
-    private static final long ACE_MAX = 8;
-    private static final long DDE_MIN = 0;
-    private static final long DDE_MAX = 63;
-    private static final long SSO_MIN = 0;
-    private static final long SSO_MAX = 100;
+    private static final int ACE_MIN = -8;
+    private static final int ACE_MAX = 8;
+    private static final int DDE_MIN = 0;
+    private static final int DDE_MAX = 63;
+    private static final int SSO_MIN = 0;
+    private static final int SSO_MAX = 100;
     
     // States as known by camera
-    private long ace;
-    private long dde;
-    private long sso;
+    private int ace;
+    private int dde;
+    private int sso;
     
     private JLabel aceLabel = null;
     private JLabel aceMaxLabel = null;
@@ -143,15 +143,14 @@ class EnhancePanel extends JPanel implements ReplyAction{
         ddeLabel.setText("DDE");
         ddeTextField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                long value = DDE_MAX + 1;
+                int value = DDE_MAX + 1;
                 try {
-                    value = Long.parseLong(aceTextField.getText());
+                    value = Integer.parseInt(aceTextField.getText());
                 } catch(NumberFormatException error){
                     ddeTextField.setText(String.valueOf(getAce()));
                 }
                 if(gui.isWithinRange(DDE_MIN, DDE_MAX, value)){
-                    setDdeMessage(value);
-                    ddeSlider.setValue((int)value);
+                    ddeSlider.setValue(value);
                 } else {
                     ddeTextField.setText(String.valueOf(getAce()));
                 }
@@ -172,15 +171,15 @@ class EnhancePanel extends JPanel implements ReplyAction{
         aceMaxLabel.setText(String.valueOf(ACE_MAX));
         aceTextField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                long value = ACE_MAX + 1;
+                int value = ACE_MAX + 1;
                 try {
-                    value = Long.parseLong(aceTextField.getText());
+                    value = Integer.parseInt(aceTextField.getText());
                 } catch(NumberFormatException error){
                     aceTextField.setText(String.valueOf(getAce()));
                     aceSlider.setValue((int)value);
                 }
                 if(gui.isWithinRange(ACE_MIN, ACE_MAX, value)){
-                    setAceMessage(value);
+                    aceSlider.setValue(value);
                 } else {
                     aceTextField.setText(String.valueOf(getAce()));
                 }
@@ -199,15 +198,14 @@ class EnhancePanel extends JPanel implements ReplyAction{
         ssoMaxLabel.setText(String.valueOf(SSO_MAX));
         ssoTextField.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent evt) {
-                long value = SSO_MAX + 1;
+                int value = SSO_MAX + 1;
                 try {
-                    value = Long.parseLong(ssoTextField.getText());
+                    value = Integer.parseInt(ssoTextField.getText());
                 } catch(NumberFormatException error){
                     ssoTextField.setText(String.valueOf(sso));
                 }
                 if(gui.isWithinRange(SSO_MIN, SSO_MAX, value)){
-                    setSsoMessage(value);
-                    ssoSlider.setValue((int)value);
+                    ssoSlider.setValue(value);
                 } else {
                     ssoTextField.setText(String.valueOf(getSso()));
                 }
@@ -368,19 +366,19 @@ class EnhancePanel extends JPanel implements ReplyAction{
         gui.sendCommand(ssoMsg);        
     }
     
-    private void setAceMessage(long value){
+    private void setAceMessage(int value){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.ACE_CORRECT_SET);
         msg.setArgs(gui.longtoTwoBytes(value));
         gui.sendCommand(msg);
     }
 
-    private void setDdeMessage(long value){
+    private void setDdeMessage(int value){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DDE_GAIN_SET);
         msg.setArgs(gui.longtoTwoBytes(value));
         gui.sendCommand(msg);
     }
     
-    private void setSsoMessage(long value){
+    private void setSsoMessage(int value){
         ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.AGC_SUB_SET);
         byte[] ssoPercentArg = gui.longtoTwoBytes(ThermalCamArguments.AGC_SSO_PERCENT.getArg());
         byte[] setting = gui.longtoTwoBytes(value);
@@ -388,33 +386,33 @@ class EnhancePanel extends JPanel implements ReplyAction{
         gui.sendCommand(msg);
     }
 
-    protected void setAce(long value){
+    protected void setAce(int value){
         this.ace = value;
         aceSlider.setValue((int)value);
         aceTextField.setText(String.valueOf(value));
     }
     
-    protected long getAce(){
+    protected int getAce(){
         return this.ace;
     }
     
-    protected void setSso(long value){
+    protected void setSso(int value){
         this.sso = value;
         ssoSlider.setValue((int)value);
         ssoTextField.setText(String.valueOf(value));
     }
     
-    protected long getSso(){
+    protected int getSso(){
         return this.sso;
     }
     
-    protected void setDde(long value){
+    protected void setDde(int value){
         this.dde = value;
         ddeSlider.setValue((int)value);
         ddeTextField.setText(String.valueOf(value));
     }
     
-    protected long getDde(){
+    protected int getDde(){
         return this.dde;
     }
     
@@ -424,13 +422,13 @@ class EnhancePanel extends JPanel implements ReplyAction{
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(rec.getFunction() == ThermalCamFunctionCodes.ACE_CORRECT_GET.getFunctionCode()){
-            setAce(gui.twoBytesToLong(rec.getArgs()));
+            setAce((int)gui.twoBytesToLong(rec.getArgs()));
         } else if (rec.getFunction() == ThermalCamFunctionCodes.DDE_GAIN_GET.getFunctionCode()){
-            setDde(gui.twoBytesToLong(rec.getArgs()));
+            setDde((int)gui.twoBytesToLong(rec.getArgs()));
         } else if ((rec.getFunction() == ThermalCamFunctionCodes.AGC_SUB_GET.getFunctionCode()) 
                 && (gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_SSO_PERCENT.getArg())){
             if(rec.getByteCount() > 0){
-                setSso(gui.twoBytesToLong(rec.getArgs()));       
+                setSso((int)gui.twoBytesToLong(rec.getArgs()));       
             }
         }
     }
