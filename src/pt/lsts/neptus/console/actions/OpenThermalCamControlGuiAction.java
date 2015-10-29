@@ -39,7 +39,6 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import no.ntnu.thermalcamcontrol.gui.ThermalCamControlGui;
-import no.ntnu.thermalcamcontrol.gui.ThermalCamFunctionCodes;
 import pt.lsts.neptus.console.ConsoleLayout;
 import pt.lsts.neptus.i18n.I18n;
 import pt.lsts.neptus.util.GuiUtils;
@@ -84,7 +83,7 @@ public class OpenThermalCamControlGuiAction extends ConsoleAction {
             thermalCamControlFrame.setResizable(true);
             thermalCamControlFrame.add(thermalCamGuiMainPanel);
             thermalCamControlFrame.setTitle("FLIR Tau 2 Camera Control GUI");       
-            thermalCamControlFrame.setMenuBar(thermalCamControlFrame.getMenuBar());
+            thermalCamControlFrame.setJMenuBar(thermalCamGuiMainPanel.getMenuBar());
             GuiUtils.setLookAndFeel();
             thermalCamControlFrame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
             console.addWindowToOppenedList(thermalCamControlFrame);
