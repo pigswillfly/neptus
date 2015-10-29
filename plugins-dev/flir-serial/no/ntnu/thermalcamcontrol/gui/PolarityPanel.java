@@ -31,45 +31,76 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
-import java.util.ArrayList;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.GroupLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class PolarityPanel extends JPanel {
+class PolarityPanel extends JPanel implements ReplyAction {
     
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     
-    private JLabel polarityLabel = null;
-    private JComboBox<?> polarityComboBox = null;
-    private ArrayList<String> mList = null;
+    private static final String[] PALETTES = { 
+            "WhiteHot", 
+            "BlackHot", 
+            "Fusion", 
+            "Rainbow", 
+            "Globow", 
+            "Ironbow1", 
+            "Ironbow2", 
+            "Sepia", 
+            "Color1", 
+            "Color2", 
+            "Icefire", 
+            "Rain", 
+            "RedHot", 
+            "GreenHot" 
+            };
 
-    protected PolarityPanel(){
+    
+    private ThermalCamControlGui gui;
+    
+    private String paletteSelected;
+    private int palette;
+    
+    private JLabel polarityLabel = null;
+    private JComboBox<String> polarityComboBox = null;
+
+    protected PolarityPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
 
     private void initialize(){
         polarityLabel = new JLabel();
+        polarityComboBox = new JComboBox<String>();
 
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        mList = new ArrayList<String>(2);
-        mList.add("WhiteHot");
-        mList.add("BlackHot");
-        polarityComboBox = new JComboBox<Object>(mList.toArray(new String[mList.size()]));
+        polarityComboBox.setModel(new DefaultComboBoxModel<String>(PALETTES));
+        polarityComboBox.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                setPaletteMessage(polarityComboBox.getSelectedIndex());
+            }
+        });
 
-        polarityLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        polarityLabel.setFont(new java.awt.Font(null, 1, 15)); // NOI18N
         polarityLabel.setText("Polarity / Palette");
 
         GroupLayout polarityPanelLayout = new GroupLayout(this);
@@ -94,21 +125,48 @@ class PolarityPanel extends JPanel {
         );
     }
     
-    private ArrayList<String> getPolarityComboBoxList(){
-        
-        if(mList == null){
-            mList = new ArrayList<String>(2);
-            mList.add("WhiteHot");
-            mList.add("BlackHot");
-        }
-        return mList;
+    private void setPaletteMessage(int palette){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_PALETTE_SET);
+        msg.setArgs(gui.longtoTwoBytes(palette));
+        gui.sendCommand(msg);
     }
     
-    public ArrayList<String> addToPolarityComboBoxList(String item){
-        if(mList == null){
-            getPolarityComboBoxList();
-        }
-        mList.add(item);
-        return mList;        
+    protected void getPaletteMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_PALETTE_GET);
+        gui.sendCommand(msg);
     }
+
+    protected void setPalette(int index){
+        this.paletteSelected = PALETTES[index];
+        polarityComboBox.setSelectedIndex(index);
+    }
+    
+    protected String getPaletteString(){
+        return this.paletteSelected;
+    }
+    
+    protected int getPalette(){
+        return this.palette;
+    }
+    
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.VIDEO_PALETTE_GET.getFunctionCode()){
+            setPalette((int)gui.twoBytesToLong(rec.getArgs()));
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        // TODO Auto-generated method stub
+        
+    }
+    
+   
 }
