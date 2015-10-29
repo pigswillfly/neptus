@@ -63,7 +63,7 @@ class StatusPanel extends JPanel implements ReplyAction{
     private long fwMinor;
     private String partNumber;
     private ThermalCamStatus status;
-    private long fpaTemp;
+    private float fpaTemp;
 
     private JLabel statusLabel = null;
     private JLabel fpaTempLabel = null;
@@ -216,12 +216,29 @@ class StatusPanel extends JPanel implements ReplyAction{
         );
     }
     
-    protected void getNumbers(){
+    protected void getNumbersMessages(){
         ThermalCamControl partNumMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.CAMERA_PART_GET);
         gui.sendCommand(partNumMsg);
         ThermalCamControl serialNumMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.SERIAL_NUMBER);
         gui.sendCommand(serialNumMsg);
-        // fpaTemp: READ_SENSOR functioncode, READ_SENSOR_FPA_TEMP_DEGCx10 argument
+        ThermalCamControl revMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.GET_REVISION);
+        gui.sendCommand(revMsg);
+    }
+    
+    protected void getFpaTempMessage(){
+        ThermalCamControl fpaTempMsg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.READ_SENSOR);
+        fpaTempMsg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.READ_SENSOR_FPA_TEMP_DEGCx10.getArg()));
+        gui.sendCommand(fpaTempMsg);
+    }
+    
+    protected void setFpaTemp(long tempx10){
+        float temp = tempx10/10;
+        this.fpaTemp = temp;
+        fpaTempLabel.setText(String.valueOf(temp));
+    }
+    
+    protected float getFpaTemp(){
+        return this.fpaTemp;
     }
     
     protected void setPartNumber(String num){
@@ -259,6 +276,18 @@ class StatusPanel extends JPanel implements ReplyAction{
         return this.status;
     }
 
+    private void setRevisions(byte[] args){
+        this.swMajor = gui.twoBytesToLong(Arrays.copyOfRange(args, 0, 2));
+        this.swMinor = gui.twoBytesToLong(Arrays.copyOfRange(args, 2, 4));
+        this.fwMajor = gui.twoBytesToLong(Arrays.copyOfRange(args, 4, 6));
+        this.fwMinor = gui.twoBytesToLong(Arrays.copyOfRange(args, 6, 8));
+    }
+    
+    protected long[] getRevisions(){
+       long[] revArray = {swMajor, swMinor, fwMajor, fwMinor};
+       return revArray;
+    }
+
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
@@ -266,10 +295,16 @@ class StatusPanel extends JPanel implements ReplyAction{
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(rec.getFunction() == ThermalCamFunctionCodes.SERIAL_NUMBER.getFunctionCode()){
             byte[] args = rec.getArgs();
-            setCameraSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 0, 3)));
-            setSensorSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 4, 7)));
+            setCameraSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 0, 4)));
+            setSensorSerialNumber(gui.fourBytesToLong(Arrays.copyOfRange(args, 4, 8)));
         } else if (rec.getFunction() == ThermalCamFunctionCodes.CAMERA_PART_GET.getFunctionCode()){
             setPartNumber(rec.getArgs().toString());
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.GET_REVISION.getFunctionCode()){
+            setRevisions(rec.getArgs());
+        } else if (rec.getFunction() == ThermalCamFunctionCodes.READ_SENSOR.getFunctionCode()){
+            if(gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.READ_SENSOR_FPA_TEMP_DEGCx10.getArg()){
+                setFpaTemp(gui.twoBytesToLong(rec.getArgs()));
+            } // else if // other sensor arguments
         }
     }
 
