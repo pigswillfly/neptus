@@ -31,8 +31,6 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
-import javax.swing.JPanel;
-
 import pt.lsts.imc.ThermalCamControl;
 
 /**
