@@ -275,7 +275,7 @@ class RoiPanel extends JPanel implements ReplyAction {
                     .addComponent(leftTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(topTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(coordinateLeftTopLabel))
-                .addGap(16, 16, 16)
+                .addGap(9, 9, 9)
                 .addGroup(coordinatePanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                     .addComponent(rightTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                     .addComponent(bottomTextField, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)

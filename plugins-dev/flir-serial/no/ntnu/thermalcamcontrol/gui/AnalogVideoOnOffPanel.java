@@ -65,8 +65,9 @@ class AnalogVideoOnOffPanel extends JPanel implements ReplyAction{
     private JLabel analogVideoOnOffLabel = null;
     private ButtonGroup analogVideoOnOffButtonGroup = null;
     
-    protected AnalogVideoOnOffPanel(){
+    protected AnalogVideoOnOffPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -84,45 +85,45 @@ class AnalogVideoOnOffPanel extends JPanel implements ReplyAction{
         analogVideoOnRadioButton.setText("On");
         analogVideoOnRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setAnalogVideoOnOffMessage(true);
+                onOffChange(true);
             }
         });
 
         analogVideoOffRadioButton.setText("Off");
         analogVideoOffRadioButton.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e) {
-                setVideoModeMessage(false);
+                onOffChange(false);
             }
         });
 
         analogVideoOnOffLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         analogVideoOnOffLabel.setText("Video On / Off");
 
-        GroupLayout analogVideoOnOffPanelLayout = new GroupLayout(this);
-        this.setLayout(analogVideoOnOffPanelLayout);
-        analogVideoOnOffPanelLayout.setHorizontalGroup(
-            analogVideoOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(analogVideoOnOffPanelLayout.createSequentialGroup()
+        GroupLayout analogVidOnOffPanelLayout = new GroupLayout(this);
+        this.setLayout(analogVidOnOffPanelLayout);
+        analogVidOnOffPanelLayout.setHorizontalGroup(
+            analogVidOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(analogVidOnOffPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(analogVideoOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(analogVidOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                     .addComponent(analogVideoOnOffLabel)
-                    .addGroup(analogVideoOnOffPanelLayout.createSequentialGroup()
+                    .addGroup(analogVidOnOffPanelLayout.createSequentialGroup()
                         .addGap(24, 24, 24)
-                        .addGroup(analogVideoOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(analogVidOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                             .addComponent(analogVideoOffRadioButton)
                             .addComponent(analogVideoOnRadioButton))))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(115, Short.MAX_VALUE))
         );
-        analogVideoOnOffPanelLayout.setVerticalGroup(
-            analogVideoOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(analogVideoOnOffPanelLayout.createSequentialGroup()
+        analogVidOnOffPanelLayout.setVerticalGroup(
+            analogVidOnOffPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(analogVidOnOffPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(analogVideoOnOffLabel)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(analogVideoOnRadioButton)
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(analogVideoOffRadioButton)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(76, Short.MAX_VALUE))
         );
     }
     
@@ -155,8 +156,12 @@ class AnalogVideoOnOffPanel extends JPanel implements ReplyAction{
         }
     }
     
+    private void onOffChange(boolean on){
+        setVideoModeMessage(!on, gui.getSetupPanel().getOperatingModePanel().isFrozen());
+    }
+    
     protected void operatingModeChange(boolean frozen){
-        setVideoModeMessage(analogVideoOnRadioButton.isSelected(), frozen);
+        setVideoModeMessage(analogVideoOffRadioButton.isSelected(), frozen);
     }
 
     /* (non-Javadoc)

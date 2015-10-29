@@ -31,30 +31,44 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class AnalogFFCPanel extends JPanel {
+class AnalogFFCPanel extends JPanel implements ReplyAction{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    private static final int FFC_WARN_TIME_MIN = 0;
+    private static final int FFC_WARN_TIME_MAX = 600;
+    
+    private ThermalCamControlGui gui;
+    
+    // in frames
+    private int ffcWarnTime = 0;
     
     private JLabel analogFFCLabel = null;
     private JLabel ffcWarningLabel = null;
     private JTextField ffcWarningText = null;
     private JLabel ffcWarningUnitLabel = null;
 
-    protected AnalogFFCPanel(){
+    protected AnalogFFCPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -69,13 +83,25 @@ class AnalogFFCPanel extends JPanel {
 
         analogFFCLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         analogFFCLabel.setText("FFC");
-
-        ffcWarningLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         ffcWarningLabel.setText("FFC Warning: ");
-
-        ffcWarningUnitLabel.setFont(new java.awt.Font("Ubuntu", 0, 12)); // NOI18N
         ffcWarningUnitLabel.setText("frames");
-
+        
+        ffcWarningText.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent evt) {
+                int value = FFC_WARN_TIME_MAX + 1;
+                try {
+                    value = Integer.parseInt(ffcWarningText.getText());
+                } catch(NumberFormatException error){
+                    ffcWarningText.setText(String.valueOf(getFfcWarningTime()));
+                }
+                if(gui.isWithinRange(FFC_WARN_TIME_MIN, FFC_WARN_TIME_MAX, value)){
+                    setFfcWarningTimeMessage(value);
+                } else {
+                    ffcWarningText.setText(String.valueOf(getFfcWarningTime()));
+                }
+            }
+        });
+        
         GroupLayout analogFFCPanelLayout = new GroupLayout(this);
         this.setLayout(analogFFCPanelLayout);
         analogFFCPanelLayout.setHorizontalGroup(
@@ -90,7 +116,7 @@ class AnalogFFCPanel extends JPanel {
                         .addComponent(ffcWarningText, GroupLayout.PREFERRED_SIZE, 46, GroupLayout.PREFERRED_SIZE)
                         .addGap(4, 4, 4)
                         .addComponent(ffcWarningUnitLabel)))
-                .addContainerGap())
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         analogFFCPanelLayout.setVerticalGroup(
             analogFFCPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -104,5 +130,45 @@ class AnalogFFCPanel extends JPanel {
                     .addComponent(ffcWarningUnitLabel))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+    }
+    
+    protected void getFfcWarningTimeMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_WARN_TIME_GET);
+        gui.sendCommand(msg);
+    }
+    
+    protected void setFfcWarningTimeMessage(int value){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.FFC_WARN_TIME_SET);
+        msg.setArgs(gui.longtoTwoBytes(value));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setFfcWarningTime(long value){
+        if(gui.isWithinRange(FFC_WARN_TIME_MIN, FFC_WARN_TIME_MAX, value)){
+            this.ffcWarnTime = (int)value;
+            ffcWarningText.setText(String.valueOf(value));
+        }
+    }
+    
+    protected int getFfcWarningTime(){
+        return this.ffcWarnTime;
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.FFC_WARN_TIME_GET.getFunctionCode()){
+            setFfcWarningTime(gui.twoBytesToLong(rec.getArgs()));
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
     }
 }

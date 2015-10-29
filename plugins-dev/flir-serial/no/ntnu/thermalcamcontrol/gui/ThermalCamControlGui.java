@@ -70,7 +70,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
      * 
      */
     private static final long serialVersionUID = 1L;
-    private static final String FPA_SIZE = "640×512";
+    private static final String FPA_SIZE = String.valueOf(ThermalCamArguments.FPA_WIDTH.getArg()) + "x" + String.valueOf(ThermalCamArguments.FPA_HEIGHT.getArg());
 
 /*
     private static ImageIcon ICON = new ImageIcon(ImageUtils.getImage(
@@ -144,50 +144,88 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     }
     
     private void askForCurrentSettings(){
-        getSetupPanel().getFFCPanel().getFFCSettingsMessage();
-        getSetupPanel().getExternalSyncPanel().getExternalSyncMessage();
-        getSetupPanel().getGainModePanel().getGainModeMessage();
-        getSetupPanel().getTestPatternPanel().getTestPatternMessage();
-        getAgcDdePanel().getEnhancePanel().getEnhanceSettings();
-        getAgcDdePanel().getManualParamPanel().getManualParams();
+        this.getSetupPanel().getFFCPanel().getFFCSettingsMessage();
+        this.getSetupPanel().getExternalSyncPanel().getExternalSyncMessage();
+        this.getSetupPanel().getGainModePanel().getGainModeMessage();
+        this.getSetupPanel().getTestPatternPanel().getTestPatternMessage();
+        this.getAgcDdePanel().getEnhancePanel().getEnhanceSettings();
+        this.getAgcDdePanel().getManualParamPanel().getManualParams();
+        this.getAgcDdePanel().getAgcModesPanel().getAgcModeMessage();
+        this.getAgcDdePanel().getEnhancePanel().getEnhanceSettings();
+        this.getRoiPanel().getRoiCoordinatesMessage();
+        this.getStatusPanel().getNumbersMessages();
+        this.getStatusPanel().getFpaTempMessage();
+        this.getAnalogPanel().getOrientationPanel().getOrientationMessage();
+        this.getAnalogPanel().getPanZoomPanel().getPanZoomMessages();
+        this.getAnalogPanel().getPolarityPanel().getPaletteMessage();
+        this.getAnalogPanel().getAnalogVideoOnOffPanel().getVideoModeMessage();
+        this.getAnalogPanel().getAnalogVideoStandardPanel().getVideoStandardMessage();
+        this.getAnalogPanel().getAnalogFFCPanel().getFfcWarningTimeMessage();
+        this.getAnalogPanel().getAnalogVideoColorPanel().getColorEnabledMessage();
     }
     
     private void setupHomePanels(){
         for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
-            String homePanel = code.getHomePanel();
-            switch(homePanel){
-                case "StatusPanel":
-                    code.setReplyAction(getStatusPanel());
-                    break;
-                case "FfcPanel":
-                    code.setReplyAction(this.getSetupPanel().getFFCPanel());
-                    break;
-                case "GainModePanel":
-                    code.setReplyAction(this.getSetupPanel().getGainModePanel());
-                    break;
-                case "SettingsButtonsPanel":
-                    code.setReplyAction(this.getSetupPanel().getSettingsButtonsPanel());
-                    break;
-                case "TestPatternPanel":
-                    code.setReplyAction(this.getSetupPanel().getTestPatternPanel());
-                    break;
-                case "ExternalSyncPanel":
-                    code.setReplyAction(this.getSetupPanel().getExternalSyncPanel());
-                    break;
-                case "EnhancePanel":
-                    code.setReplyAction(this.getAgcDdePanel().getEnhancePanel());
-                    break;
-                case "ManualParamPanel":
-                    code.setReplyAction(this.getAgcDdePanel().getManualParamPanel());
-                    break;
-                case "AgcModesPanel":
-                    code.setReplyAction(this.getAgcDdePanel().getAgcModesPanel());
-                    break;
-                case "RoiPanel":
-                    code.setReplyAction(this.getRoiPanel());
-                    break;
-                default:
-                    code.setReplyAction(this);
+            try{
+                String homePanel = code.getHomePanel();
+                switch(homePanel){
+                    case "StatusPanel":
+                        code.setReplyAction(getStatusPanel());
+                        break;
+                    case "FfcPanel":
+                        code.setReplyAction(this.getSetupPanel().getFFCPanel());
+                        break;
+                    case "GainModePanel":
+                        code.setReplyAction(this.getSetupPanel().getGainModePanel());
+                        break;
+                    case "SettingsButtonsPanel":
+                        code.setReplyAction(this.getSetupPanel().getSettingsButtonsPanel());
+                        break;
+                    case "TestPatternPanel":
+                        code.setReplyAction(this.getSetupPanel().getTestPatternPanel());
+                        break;
+                    case "ExternalSyncPanel":
+                        code.setReplyAction(this.getSetupPanel().getExternalSyncPanel());
+                        break;
+                    case "EnhancePanel":
+                        code.setReplyAction(this.getAgcDdePanel().getEnhancePanel());
+                        break;
+                    case "ManualParamPanel":
+                        code.setReplyAction(this.getAgcDdePanel().getManualParamPanel());
+                        break;
+                    case "AgcModesPanel":
+                        code.setReplyAction(this.getAgcDdePanel().getAgcModesPanel());
+                        break;
+                    case "RoiPanel":
+                        code.setReplyAction(this.getRoiPanel());
+                        break;
+                    case "OrientationPanel":
+                        code.setReplyAction(this.getAnalogPanel().getOrientationPanel());
+                        break;
+                    case "PanZoomPanel":
+                        code.setReplyAction(this.getAnalogPanel().getPanZoomPanel());
+                        break;
+                    case "PolarityPanel":
+                        code.setReplyAction(this.getAnalogPanel().getPolarityPanel());
+                        break;
+                    case "AnalogVideoOnOffPanel":
+                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoOnOffPanel());
+                        break;
+                    case "AnalogVideoStandardPanel":
+                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoStandardPanel());
+                        break;
+                    case "AnalogFFCPanel":
+                        code.setReplyAction(this.getAnalogPanel().getAnalogFFCPanel());
+                        break;
+                    case "AnalogVideoColorPanel":
+                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoColorPanel());
+                        break;
+                    default:
+                        code.setReplyAction(this);
+                }
+            }
+            catch(NullPointerException e){
+                code.setReplyAction(this);
             }
         }
     }
@@ -330,7 +368,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     
     public AnalogPanel getAnalogPanel(){
         if(analogPanel == null){
-            analogPanel = new AnalogPanel();
+            analogPanel = new AnalogPanel(this);
         }
         return analogPanel;
     }
@@ -489,10 +527,6 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         ret[0] = (byte) (arg & 0xFF);
         ret[1] = (byte) ((arg >> 8) & 0xFF);
         return ret;
-    }
-
-    protected long twoBytesToLong(byte first, byte second){
-        return (long)((first & 0xFF) << 8) | (second & 0xFF);
     }
         
     protected boolean isWithinRange(long min, long max, long value){

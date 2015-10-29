@@ -42,61 +42,24 @@ class AnalogPanel extends JPanel {
 
     private static final long serialVersionUID = 1L;
     
-    private JPanel orientationPanel = null;
-    private JPanel videoStandardPanel = null;
-    private JPanel polarityPanel = null;
-    private JPanel analogFFCPanel = null;
-    private JPanel analogVideoColorPanel = null;
-    private JPanel analogVideoOnOffPanel = null;
-    private JPanel panZoomPanel = null;
+    private ThermalCamControlGui gui;
+    
+    private OrientationPanel orientationPanel = null;
+    private AnalogVideoStandardPanel videoStandardPanel = null;
+    private PolarityPanel polarityPanel = null;
+    private AnalogFFCPanel analogFFCPanel = null;
+    private AnalogVideoColorPanel analogVideoColorPanel = null;
+    private AnalogVideoOnOffPanel analogVideoOnOffPanel = null;
+    private PanZoomPanel panZoomPanel = null;
 
-    protected AnalogPanel() {
+    protected AnalogPanel(ThermalCamControlGui gui) {
         super();
+        this.gui = gui;
         initialize();
     }
                         
     private void initialize() {
- /*       
-        GroupLayout layout = new GroupLayout(this);
-        this.setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getPanZoomPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getOrientationPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getPolarityPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getAnalogVideoOnOffPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getVideoStandardPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getAnalogFFCPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getAnalogVideoColorPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getAnalogFFCPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getOrientationPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getPolarityPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addComponent(getPanZoomPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                            .addComponent(getAnalogVideoOnOffPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(getAnalogVideoColorPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addComponent(getVideoStandardPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-   */     
+    
         GroupLayout layout = new GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -108,7 +71,7 @@ class AnalogPanel extends JPanel {
                         .addComponent(getPanZoomPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
                         .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                            .addComponent(getVideoStandardPanel(), GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(getAnalogVideoStandardPanel(), GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                                     .addComponent(getPolarityPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
@@ -136,58 +99,58 @@ class AnalogPanel extends JPanel {
                             .addComponent(getAnalogVideoColorPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(getAnalogVideoOnOffPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(getVideoStandardPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(getAnalogVideoStandardPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                     .addComponent(getPanZoomPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
     }      
 
-    private JPanel getOrientationPanel(){
+    protected OrientationPanel getOrientationPanel(){
 
         if(orientationPanel == null)
-            orientationPanel = new OrientationPanel();
+            orientationPanel = new OrientationPanel(this.gui);
         return orientationPanel;
     }
     
-    private JPanel getPanZoomPanel(){
+    protected PanZoomPanel getPanZoomPanel(){
         
         if(panZoomPanel == null)
-            panZoomPanel = new PanZoomPanel();
+            panZoomPanel = new PanZoomPanel(this.gui);
         return panZoomPanel;
     }
     
-    private JPanel getPolarityPanel(){
+    protected PolarityPanel getPolarityPanel(){
         
         if(polarityPanel == null)         
-            polarityPanel = new PolarityPanel();
+            polarityPanel = new PolarityPanel(this.gui);
         return polarityPanel;
     }
     
-    private JPanel getAnalogVideoOnOffPanel(){
+    protected AnalogVideoOnOffPanel getAnalogVideoOnOffPanel(){
 
         if(analogVideoOnOffPanel == null)       
-            analogVideoOnOffPanel = new AnalogVideoOnOffPanel();
+            analogVideoOnOffPanel = new AnalogVideoOnOffPanel(this.gui);
         return analogVideoOnOffPanel;
     }
     
-    private JPanel getVideoStandardPanel(){
+    protected AnalogVideoStandardPanel getAnalogVideoStandardPanel(){
         
         if(videoStandardPanel == null)
-            videoStandardPanel = new AnalogVideoStandardPanel();
+            videoStandardPanel = new AnalogVideoStandardPanel(this.gui);
         return videoStandardPanel;
     }
     
-    private JPanel getAnalogFFCPanel(){
+    protected AnalogFFCPanel getAnalogFFCPanel(){
 
         if(analogFFCPanel == null)
-            analogFFCPanel = new AnalogFFCPanel();
+            analogFFCPanel = new AnalogFFCPanel(this.gui);
         return analogFFCPanel;
     }
     
-    private JPanel getAnalogVideoColorPanel(){
+    protected AnalogVideoColorPanel getAnalogVideoColorPanel(){
 
         if(analogVideoColorPanel == null)
-            analogVideoColorPanel = new AnalogVideoColorPanel();
+            analogVideoColorPanel = new AnalogVideoColorPanel(this.gui);
         return analogVideoColorPanel;
     }
        

@@ -107,7 +107,7 @@ class ThermalCamSettings {
         setFfcIntervalLowGain(0x0708);
         setFfcTempIntervalHighGain(0x0005);
         setFfcTempIntervalLowGain(0x0005);
-        setVideoPalette((int)ThermalCamArguments.VIDEO_PALETTE_WHITE_HOT.getArg());
+        setVideoPalette(0);
         setVideoMode(0x0000);
         setVideoOrientation(0x0000);
         setDigitalOutputMode((int)ThermalCamArguments.DIGITAL_OUTPUT_DISABLED.getArg());
@@ -154,7 +154,6 @@ class ThermalCamSettings {
         gui.getSetupPanel().getFFCPanel().setFFCPeriod(getFfcIntervalHighGain(), false);
         gui.getSetupPanel().getFFCPanel().setFFCTempDelta(getFfcTempIntervalLowGain(), true);
         gui.getSetupPanel().getFFCPanel().setFFCTempDelta(getFfcTempIntervalHighGain(), false);
-        gui.getSetupPanel().getOperatingModePanel().setOperatingMode(getVideoMode() & 0x0001);
         gui.getSetupPanel().getExternalSyncPanel().setExternalSync(getExternalSyncMode());
         //etc
     }

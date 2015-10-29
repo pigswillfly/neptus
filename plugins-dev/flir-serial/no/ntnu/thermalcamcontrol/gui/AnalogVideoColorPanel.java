@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -53,12 +56,17 @@ class AnalogVideoColorPanel extends JPanel implements ReplyAction{
      */
     private static final long serialVersionUID = 1L;
     
+    private ThermalCamControlGui gui;
+    
+    private boolean colorEnabled;
+    
     private JRadioButton analogVideoColorRadioButton = null;
     private JRadioButton analogVideoMonochromeRadioButton = null;
     private JLabel analogVideoColorLabel = null;
     
-    protected AnalogVideoColorPanel(){
+    protected AnalogVideoColorPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -74,9 +82,19 @@ class AnalogVideoColorPanel extends JPanel implements ReplyAction{
         
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        analogVideoColorRadioButton.setText("Color");
+        analogVideoColorRadioButton.setText("Color");        
+        analogVideoColorRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setColorEnabledMessage(true);
+            }
+        });
 
         analogVideoMonochromeRadioButton.setText("Monochrome");
+        analogVideoColorRadioButton.addActionListener(new ActionListener(){
+            public void actionPerformed(ActionEvent e) {
+                setColorEnabledMessage(false);
+            }
+        });
 
         analogVideoColorLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         analogVideoColorLabel.setText("Video Color");
@@ -106,22 +124,43 @@ class AnalogVideoColorPanel extends JPanel implements ReplyAction{
                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(analogVideoMonochromeRadioButton)
                 .addContainerGap())
-        );
-        askForCurrentSetting();
-       
+        );       
     }
     
-    private void askForCurrentSetting(){
-        analogVideoMonochromeRadioButton.setSelected(true);
+    protected void setColorEnabledMessage(boolean enable){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_COLOR_MODE_SET);
+        long arg = 0;
+        if(enable)
+            arg = ThermalCamArguments.COLOR_MODE_COLOR_ENABLED.getArg();
+        msg.setArgs(gui.longtoTwoBytes(arg));
+        gui.sendCommand(msg);
+    }
+    
+    protected void getColorEnabledMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.VIDEO_COLOR_MODE_GET);
+        gui.sendCommand(msg);
+    }
+    
+    protected void enableColor(boolean enable){
+        this.colorEnabled = enable;
+        if(enable)
+            analogVideoColorRadioButton.setSelected(true);
+        else
+            analogVideoMonochromeRadioButton.setSelected(true);
     }
 
+    protected boolean isColorEnabled(){
+        return this.colorEnabled;
+    }
+    
     /* (non-Javadoc)
      * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
      */
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
-        // TODO Auto-generated method stub
-        
+        if(rec.getFunction() == ThermalCamFunctionCodes.VIDEO_COLOR_MODE_GET.getFunctionCode()){
+            enableColor((gui.twoBytesToLong(rec.getArgs()) == ThermalCamArguments.COLOR_MODE_COLOR_ENABLED.getArg()));
+        }
     }
 
     /* (non-Javadoc)

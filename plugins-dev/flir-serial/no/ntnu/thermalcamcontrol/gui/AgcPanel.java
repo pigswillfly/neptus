@@ -233,9 +233,9 @@ public class AgcPanel extends JPanel implements ReplyAction{
                 setAgcMode(gui.twoBytesToLong(rec.getArgs()));
             } else if (gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_SSO_PERCENT.getArg()){
                 if(rec.getByteCount() > 0){
-                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(rec.getArgs()));
+                    gui.getAgcDdePanel().getEnhancePanel().setSso((int)gui.twoBytesToLong(rec.getArgs()));
                 } else {
-                    gui.getAgcDdePanel().getEnhancePanel().setSso(gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4)));
+                    gui.getAgcDdePanel().getEnhancePanel().setSso((int)gui.twoBytesToLong(Arrays.copyOfRange(rec.getArgs(), 2, 4)));
                 }
             } else if ((gui.twoBytesToLong(sent.getArgs()) == ThermalCamArguments.AGC_INFO_THRESHOLD.getArg())
                     && (rec.getByteCount() > 0)){
