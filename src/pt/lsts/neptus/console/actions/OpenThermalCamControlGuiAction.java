@@ -78,8 +78,8 @@ public class OpenThermalCamControlGuiAction extends ConsoleAction {
                     super.windowClosing(e);
                 }
             });
-            thermalCamControlFrame.setSize(900,750);
-            thermalCamControlFrame.setLocation(500,100);
+            thermalCamControlFrame.setSize(950,800);
+            thermalCamControlFrame.setLocation(500,80);
             thermalCamControlFrame.setResizable(true);
             thermalCamControlFrame.add(thermalCamGuiMainPanel);
             thermalCamControlFrame.setTitle("FLIR Tau 2 Camera Control GUI");       
