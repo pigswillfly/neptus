@@ -596,7 +596,7 @@ class PanZoomPanel extends JPanel implements ReplyAction{
     }
     
     private void setZoomRadioButtons(int value){
-        if(value == 0){
+        if(value == 1){
             unzoomRadioButton.setSelected(true);
         } else if (value == 2){
             zoom2xRadioButton.setSelected(true);
