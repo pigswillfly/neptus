@@ -196,12 +196,11 @@ public enum ThermalCamFunctionCodes{
     private String homePanel;
     private ReplyAction action;
     
-    ThermalCamFunctionCodes(int code, int cSize, int rSize, String desc, String home){//, ReplyAction act){
+    ThermalCamFunctionCodes(int code, int cSize, int rSize, String desc, String home){
         this.functionCode = code;
         this.cmdByteCount = cSize;
         this.replyByteCount = rSize;
         this.description = desc;
-        //this.homePanel = home;
     }
     
     public short getFunctionCode(){
@@ -238,6 +237,72 @@ public enum ThermalCamFunctionCodes{
         msg.setFunction(func.getFunctionCode());
         msg.setByteCount(func.getCmdByteCount());
         return msg;
+    }
+    
+    protected static void setupHomePanels(ThermalCamControlGui gui){
+        for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
+            try{
+                String homePanel = code.getHomePanel();
+                switch(homePanel){
+                    case "StatusPanel":
+                        code.setReplyAction(gui.getStatusPanel());
+                        break;
+                    case "FfcPanel":
+                        code.setReplyAction(gui.getSetupPanel().getFFCPanel());
+                        break;
+                    case "GainModePanel":
+                        code.setReplyAction(gui.getSetupPanel().getGainModePanel());
+                        break;
+                    case "SettingsButtonsPanel":
+                        code.setReplyAction(gui.getSetupPanel().getSettingsButtonsPanel());
+                        break;
+                    case "TestPatternPanel":
+                        code.setReplyAction(gui.getSetupPanel().getTestPatternPanel());
+                        break;
+                    case "ExternalSyncPanel":
+                        code.setReplyAction(gui.getSetupPanel().getExternalSyncPanel());
+                        break;
+                    case "EnhancePanel":
+                        code.setReplyAction(gui.getAgcDdePanel().getEnhancePanel());
+                        break;
+                    case "ManualParamPanel":
+                        code.setReplyAction(gui.getAgcDdePanel().getManualParamPanel());
+                        break;
+                    case "AgcModesPanel":
+                        code.setReplyAction(gui.getAgcDdePanel().getAgcModesPanel());
+                        break;
+                    case "RoiPanel":
+                        code.setReplyAction(gui.getRoiPanel());
+                        break;
+                    case "OrientationPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getOrientationPanel());
+                        break;
+                    case "PanZoomPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getPanZoomPanel());
+                        break;
+                    case "PolarityPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getPolarityPanel());
+                        break;
+                    case "AnalogVideoOnOffPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getAnalogVideoOnOffPanel());
+                        break;
+                    case "AnalogVideoStandardPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getAnalogVideoStandardPanel());
+                        break;
+                    case "AnalogFFCPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getAnalogFFCPanel());
+                        break;
+                    case "AnalogVideoColorPanel":
+                        code.setReplyAction(gui.getAnalogPanel().getAnalogVideoColorPanel());
+                        break;
+                    default:
+                        code.setReplyAction(gui);
+                }
+            }
+            catch(NullPointerException e){
+                code.setReplyAction(gui);
+            }
+        }
     }
     
 }

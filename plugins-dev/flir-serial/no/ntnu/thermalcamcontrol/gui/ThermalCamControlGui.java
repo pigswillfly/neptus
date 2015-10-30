@@ -138,7 +138,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         factorySettings = new ThermalCamSettings(this);
         savedSettings = new ThermalCamSettings(this);
         
-        setupHomePanels();
+        ThermalCamFunctionCodes.setupHomePanels(this);
                
         sendConnectRequest(); 
     }
@@ -163,73 +163,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         this.getAnalogPanel().getAnalogFFCPanel().getFfcWarningTimeMessage();
         this.getAnalogPanel().getAnalogVideoColorPanel().getColorEnabledMessage();
     }
-    
-    private void setupHomePanels(){
-        for(ThermalCamFunctionCodes code: ThermalCamFunctionCodes.values()){
-            try{
-                String homePanel = code.getHomePanel();
-                switch(homePanel){
-                    case "StatusPanel":
-                        code.setReplyAction(getStatusPanel());
-                        break;
-                    case "FfcPanel":
-                        code.setReplyAction(this.getSetupPanel().getFFCPanel());
-                        break;
-                    case "GainModePanel":
-                        code.setReplyAction(this.getSetupPanel().getGainModePanel());
-                        break;
-                    case "SettingsButtonsPanel":
-                        code.setReplyAction(this.getSetupPanel().getSettingsButtonsPanel());
-                        break;
-                    case "TestPatternPanel":
-                        code.setReplyAction(this.getSetupPanel().getTestPatternPanel());
-                        break;
-                    case "ExternalSyncPanel":
-                        code.setReplyAction(this.getSetupPanel().getExternalSyncPanel());
-                        break;
-                    case "EnhancePanel":
-                        code.setReplyAction(this.getAgcDdePanel().getEnhancePanel());
-                        break;
-                    case "ManualParamPanel":
-                        code.setReplyAction(this.getAgcDdePanel().getManualParamPanel());
-                        break;
-                    case "AgcModesPanel":
-                        code.setReplyAction(this.getAgcDdePanel().getAgcModesPanel());
-                        break;
-                    case "RoiPanel":
-                        code.setReplyAction(this.getRoiPanel());
-                        break;
-                    case "OrientationPanel":
-                        code.setReplyAction(this.getAnalogPanel().getOrientationPanel());
-                        break;
-                    case "PanZoomPanel":
-                        code.setReplyAction(this.getAnalogPanel().getPanZoomPanel());
-                        break;
-                    case "PolarityPanel":
-                        code.setReplyAction(this.getAnalogPanel().getPolarityPanel());
-                        break;
-                    case "AnalogVideoOnOffPanel":
-                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoOnOffPanel());
-                        break;
-                    case "AnalogVideoStandardPanel":
-                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoStandardPanel());
-                        break;
-                    case "AnalogFFCPanel":
-                        code.setReplyAction(this.getAnalogPanel().getAnalogFFCPanel());
-                        break;
-                    case "AnalogVideoColorPanel":
-                        code.setReplyAction(this.getAnalogPanel().getAnalogVideoColorPanel());
-                        break;
-                    default:
-                        code.setReplyAction(this);
-                }
-            }
-            catch(NullPointerException e){
-                code.setReplyAction(this);
-            }
-        }
-    }
-    
+
     private void sendConnectRequest(){
         if(connectedLabel.getIcon() == RED_LIGHT){
             connectedLabel.setIcon(YELLOW_LIGHT);
@@ -327,12 +261,14 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
         return savedSettings;
     }
  
-    /** Reply Action Interface **/
+    /** Default Reply Action Interface **/
     
     @Override
     public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
         if(rec.getFunction() == ThermalCamFunctionCodes.NO_OP.getFunctionCode()){
             updateConnected(true);
+        } else {
+            //??
         }
     }
     
@@ -530,7 +466,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     }
         
     protected boolean isWithinRange(long min, long max, long value){
-        return ((value < max)&&(value > min));
+        return ((value <= max)&&(value >= min));
     }
     
     protected byte[] concatenate(byte[] first, byte[] second){
