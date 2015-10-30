@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -38,16 +41,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class LvdsControlPanel extends JPanel {
+class LvdsControlPanel extends JPanel implements ReplyAction {
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui;
+    
+    private int lvdsControl;
+    private boolean lvdsEnabled;
     
     private JRadioButton lvdsControl8bitRadioButton = null;
     private JRadioButton lvdsControlOffRadioButton = null;
@@ -55,8 +66,9 @@ class LvdsControlPanel extends JPanel {
     private JLabel lvdsControlLabel = null;
     private ButtonGroup lvdsControlButtonGroup = null;
     
-    protected LvdsControlPanel(){
+    protected LvdsControlPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -72,12 +84,32 @@ class LvdsControlPanel extends JPanel {
         lvdsControlButtonGroup.add(lvdsControl14bitRadioButton);
         
         this.setBorder(BorderFactory.createEtchedBorder());
+        
+        lvdsControlOffRadioButton.setText("Off");
+        lvdsControlOffRadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setLvdsEnableMessage(false);
+            }
+        });
 
         lvdsControl8bitRadioButton.setText("8-bit");
-
-        lvdsControlOffRadioButton.setText("Off");
+        lvdsControl8bitRadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setLvdsEnableMessage(true);
+                setLvdsControlMessage(ThermalCamArguments.LVDS_BIT_DEPTH_8.getArg());
+            }
+        });
 
         lvdsControl14bitRadioButton.setText("14-bit Filtered");
+        lvdsControl14bitRadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setLvdsEnableMessage(true);
+                setLvdsControlMessage(ThermalCamArguments.LVDS_BIT_DEPTH_14.getArg());
+            }
+        });
 
         lvdsControlLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         lvdsControlLabel.setText("LVDS Control");
@@ -89,14 +121,11 @@ class LvdsControlPanel extends JPanel {
             .addGroup(lvdsControlPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(lvdsControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(lvdsControlPanelLayout.createSequentialGroup()
-                        .addGap(12, 12, 12)
-                        .addGroup(lvdsControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                            .addComponent(lvdsControlOffRadioButton)
-                            .addComponent(lvdsControl8bitRadioButton)
-                            .addComponent(lvdsControl14bitRadioButton)))
-                    .addComponent(lvdsControlLabel))
-                .addContainerGap(42, Short.MAX_VALUE))
+                    .addComponent(lvdsControlLabel)
+                    .addComponent(lvdsControlOffRadioButton)
+                    .addComponent(lvdsControl8bitRadioButton)
+                    .addComponent(lvdsControl14bitRadioButton))
+                .addContainerGap(156, Short.MAX_VALUE))
         );
         lvdsControlPanelLayout.setVerticalGroup(
             lvdsControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -105,11 +134,101 @@ class LvdsControlPanel extends JPanel {
                 .addComponent(lvdsControlLabel)
                 .addGap(18, 18, 18)
                 .addComponent(lvdsControlOffRadioButton)
-                .addGap(10, 10, 10)
+                .addGap(18, 18, 18)
                 .addComponent(lvdsControl8bitRadioButton)
-                .addGap(10, 10, 10)
+                .addGap(18, 18, 18)
                 .addComponent(lvdsControl14bitRadioButton)
-                .addContainerGap(44, Short.MAX_VALUE))
+                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+    }
+    
+    protected void getLVDSEnableMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB);
+        msg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.LVDS_OUTPUT_ENABLE_GET.getArg()));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setLvdsEnableMessage(boolean enable){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_SET_SUB);
+        long arg = ThermalCamArguments.LVDS_MODE_DISABLED.getArg();
+        if(enable)
+            arg = ThermalCamArguments.LVDS_MODE_ENABLED.getArg();
+        byte[] args = {(byte)ThermalCamArguments.LVDS_OUTPUT_ENABLE_SET.getArg(), (byte)arg};
+        msg.setArgs(args);
+        gui.sendCommand(msg);
+    }
+    
+    protected void getLvdsControlMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB);
+        msg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.LVDS_BIT_DEPTH_GET.getArg()));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setLvdsControlMessage(long setting){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_SET_SUB);
+        byte[] args = {(byte)ThermalCamArguments.LVDS_BIT_DEPTH_SET.getArg(), (byte)setting};
+        msg.setArgs(args);
+        gui.sendCommand(msg);
+    }
+    
+    protected boolean isLvdsEnabled(){
+        return this.lvdsEnabled;
+    }
+    
+    protected void enableLvdsOutput(boolean enable){
+        this.lvdsEnabled = enable;
+    }
+    
+    protected int getLvdsControl(){
+        return this.lvdsControl;
+    }
+    
+    protected void setLvdsControl(int setting){
+        if(setting == (int) ThermalCamArguments.LVDS_BIT_DEPTH_8.getArg()){
+            this.lvdsControl = setting;
+            greyOut(false);
+            lvdsControl8bitRadioButton.setSelected(true);
+        } else if(setting == (int) ThermalCamArguments.LVDS_BIT_DEPTH_14.getArg()){
+            this.lvdsControl = setting;
+            greyOut(false);
+            lvdsControl14bitRadioButton.setSelected(true);    
+        } else {
+            lvdsControlOffRadioButton.setSelected(true);
+        }
+    }
+    
+    protected void greyOut(boolean greyOut){
+        if(greyOut)
+            lvdsControlOffRadioButton.setSelected(true);
+        lvdsControl8bitRadioButton.setEnabled(!greyOut);
+        lvdsControl14bitRadioButton.setEnabled(!greyOut);
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB.getFunctionCode()){ 
+            if(((int)sent.getArgs()[0] == (int)ThermalCamArguments.LVDS_BIT_DEPTH_GET.getArg()) 
+            || ((int)sent.getArgs()[0] == (int)ThermalCamArguments.LVDS_BIT_DEPTH_SET.getArg())){
+                setLvdsControl((int)gui.twoBytesToLong(rec.getArgs()));
+            } else if (((int)sent.getArgs()[0] == (int)ThermalCamArguments.LVDS_OUTPUT_ENABLE_GET.getArg()) 
+                    || ((int)sent.getArgs()[0] == (int)ThermalCamArguments.LVDS_OUTPUT_ENABLE_SET.getArg())){
+                if(rec.getArgs()[1] == ThermalCamArguments.LVDS_MODE_ENABLED.getArg())
+                    enableLvdsOutput(true);
+                else 
+                    enableLvdsOutput(false);                   
+            }
+        }
+        
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
     }
 }

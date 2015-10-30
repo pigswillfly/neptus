@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -39,16 +42,23 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class XpBusOutputPanel extends JPanel {
+class XpBusOutputPanel extends JPanel implements ReplyAction{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
+    
+    private ThermalCamControlGui gui;
+    
+    private int xpBusOutput;
     
     private JLabel xpBusOutputLabel = null;
     private JRadioButton xpBusOutputCMOSRadioButton = null;
@@ -56,8 +66,9 @@ class XpBusOutputPanel extends JPanel {
     private JRadioButton xpBusOutputBT656RadioButton = null;
     private ButtonGroup xpBusOutputButtonGroup = null;
     
-    protected XpBusOutputPanel(){
+    protected XpBusOutputPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -76,13 +87,34 @@ class XpBusOutputPanel extends JPanel {
 
         xpBusOutputLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
         xpBusOutputLabel.setText("XP Bus Output");
-
-        xpBusOutputCMOSRadioButton.setText("CMOS");
-
+        
         xpBusOutputNoneRadioButton.setText("None");
+        xpBusOutputNoneRadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setXpBusOutputMessage(ThermalCamArguments.XP_MODE_DISABLED.getArg());
+                gui.getDigitalPanel().getXpBusControlPanel().greyOut(true);
+            }
+        });
 
         xpBusOutputBT656RadioButton.setText("BT.656");
+        xpBusOutputBT656RadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setXpBusOutputMessage(ThermalCamArguments.XP_MODE_BT656.getArg());
+                gui.getDigitalPanel().getXpBusControlPanel().greyOut(true);
+            }
+        });
 
+        xpBusOutputCMOSRadioButton.setText("CMOS");
+        xpBusOutputCMOSRadioButton.addActionListener(new ActionListener(){
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setXpBusOutputMessage(ThermalCamArguments.XP_MODE_CMOS.getArg());
+                gui.getDigitalPanel().getXpBusControlPanel().greyOut(false);
+            }
+        });
+        
         GroupLayout xpBusOutputPanelLayout = new GroupLayout(this);
         this.setLayout(xpBusOutputPanelLayout);
         xpBusOutputPanelLayout.setHorizontalGroup(
@@ -113,10 +145,65 @@ class XpBusOutputPanel extends JPanel {
                 .addContainerGap())
         );
        
-        askForCurrentSetting();
+    }
+    
+    protected void getXpBusOutputMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB);
+        msg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.XP_MODE_GET.getArg()));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setXpBusOutputMessage(long setting){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_SET_SUB);
+        byte[] args = {(byte)ThermalCamArguments.XP_MODE_SET.getArg(), (byte)setting};
+        msg.setArgs(args);
+        gui.sendCommand(msg);
     }
 
-    private void askForCurrentSetting(){
-        xpBusOutputNoneRadioButton.setSelected(true);
+    protected int getXpBusOutput(){
+        return this.xpBusOutput;
+    }
+    
+    protected void setXpBusOutput(int setting){
+        if (setting == (int) ThermalCamArguments.XP_MODE_BT656.getArg()){
+            this.xpBusOutput = setting;
+            xpBusOutputBT656RadioButton.setSelected(true);
+            gui.getDigitalPanel().getXpBusControlPanel().setXpBusControl(setting);
+        } else if (setting == (int) ThermalCamArguments.XP_MODE_CMOS.getArg()){
+            this.xpBusOutput = setting;
+            xpBusOutputCMOSRadioButton.setSelected(true);
+            gui.getDigitalPanel().getXpBusControlPanel().setXpBusControl(setting);
+        } else {
+            this.xpBusOutput = (int) ThermalCamArguments.XP_MODE_DISABLED.getArg();
+            xpBusOutputNoneRadioButton.setSelected(true);
+            gui.getDigitalPanel().getXpBusControlPanel().setXpBusControl(setting);
+        }
+    }
+    
+    protected void greyOut(boolean greyOut){
+        if(greyOut)
+            xpBusOutputNoneRadioButton.setSelected(true);
+        xpBusOutputCMOSRadioButton.setEnabled(!greyOut);
+        xpBusOutputBT656RadioButton.setEnabled(!greyOut);
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if((rec.getFunction() == ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB.getFunctionCode()) 
+         &&(((int)sent.getArgs()[0] == (int)ThermalCamArguments.XP_MODE_GET.getArg()))
+         || ((int)sent.getArgs()[0] == (int)ThermalCamArguments.XP_MODE_SET.getArg())){
+            setXpBusOutput((int)gui.twoBytesToLong(rec.getArgs()));
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
     }
 }

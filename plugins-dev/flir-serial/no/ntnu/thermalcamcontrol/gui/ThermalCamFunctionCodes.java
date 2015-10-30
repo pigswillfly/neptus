@@ -77,9 +77,10 @@ public enum ThermalCamFunctionCodes{
     VIDEO_PALETTE_SET(0x10, 2, 2, "Set video palette", "PolarityPanel"), 
     VIDEO_ORIENTATION_GET(0x11, 0, 2, "Get video orientation", "OrientationPanel"), 
     VIDEO_ORIENTATION_SET(0x11, 2, 2, "Set video orientation", "OrientationPanel"), 
-    DIGITAL_OUTPUT_MODE_GET(0x12, 0, 2, "Get digital output mode", "?"), 
-    DIGITAL_OUTPUT_MODE_GET_SUB(0x12, 2, 2, "Get digital output mode (various sub functions)", "?"), 
-    DIGITAL_OUTPUT_MODE_SET(0x12, 2, 2, "Enable/disable digital output (both LVDS and XP channels)", "?"), 
+    DIGITAL_OUTPUT_MODE_GET(0x12, 0, 2, "Get digital output mode", "DigitalPanel"), 
+    DIGITAL_OUTPUT_MODE_GET_SUB(0x12, 2, 2, "Get digital output mode (various sub functions)", "DigitalPanel"), 
+    DIGITAL_OUTPUT_MODE_SET(0x12, 2, 2, "Enable/disable digital output (both LVDS and XP channels)", "DigitalPanel"), 
+    DIGITAL_OUTPUT_MODE_SET_SUB(0x12, 2, 2, "Set digital output mode (various sub functions)", "DigitalPanel"), 
     AGC_TYPE_GET(0x13, 0, 2, "Get AGC algorithm", "AgcModesPanel"), 
     AGC_TYPE_SET(0x13, 2, 2, "Set AGC algorithm", "AgcModesPanel"), 
     AGC_SUB_GET(0x13, 2, 2, "AGC sub functions", "AgcModesPanel"), 
@@ -294,6 +295,9 @@ public enum ThermalCamFunctionCodes{
                         break;
                     case "AnalogVideoColorPanel":
                         code.setReplyAction(gui.getAnalogPanel().getAnalogVideoColorPanel());
+                        break;
+                    case "DigitalPanel":
+                        code.setReplyAction(gui.getDigitalPanel());
                         break;
                     default:
                         code.setReplyAction(gui);

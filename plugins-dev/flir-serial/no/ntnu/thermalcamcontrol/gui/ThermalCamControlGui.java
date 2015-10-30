@@ -311,7 +311,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     
     public DigitalPanel getDigitalPanel(){
         if(digitalPanel == null){
-            digitalPanel = new DigitalPanel();
+            digitalPanel = new DigitalPanel(this);
         }
         return digitalPanel;
     }
@@ -446,7 +446,7 @@ public class ThermalCamControlGui extends ConsolePanel implements MainVehicleCha
     }
     
     /** Helper functions for getting and setting ThermalCamControl IMC Message args **/
-    
+        
     protected long twoBytesToLong(byte[] array){
         return (long)((array[0] & 0xFF) << 8) | (array[1] & 0xFF);
     }

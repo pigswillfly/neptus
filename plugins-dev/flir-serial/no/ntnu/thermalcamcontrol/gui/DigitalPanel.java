@@ -32,25 +32,44 @@
 package no.ntnu.thermalcamcontrol.gui;
 
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
+import java.awt.event.ActionListener;
+
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
+import javax.swing.JCheckBox;
+import javax.swing.JLabel;
 
 /**
  * @author liz
  *
  */
-class DigitalPanel extends JPanel {
+class DigitalPanel extends JPanel implements ReplyAction{
 
     private static final long serialVersionUID = 1L;
+
+    private ThermalCamControlGui gui;
     
-    private JPanel xpBusOutputPanel = null;
-    private JPanel xpBusControlPanel = null;
-    private JPanel eightBitDigitalChannelOptionsPanel = null;
-    private JPanel lvdsControlPanel = null;
-    private JPanel eightBitDigitalChannelColorControlPanel = null;
+    private boolean digitalOutputEnabled;
+    
+    private XpBusOutputPanel xpBusOutputPanel = null;
+    private XpBusControlPanel xpBusControlPanel = null;
+    private EightBitOptionsPanel eightBitOptionsPanel = null;
+    private LvdsControlPanel lvdsControlPanel = null;
+    private EightBitColorControlPanel eightBitColorControlPanel = null;
 
+    private JPanel digitalOutputPanel = null;
+    private JLabel digitalOutputLabel = null;
+    private JCheckBox digitalOutputEnableCheckBox = null;
 
-    public DigitalPanel() {
+    public DigitalPanel(ThermalCamControlGui gui) {
         super();
+        this.gui = gui;
         initialize();
     }
     
@@ -62,71 +81,210 @@ class DigitalPanel extends JPanel {
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getXpBusOutputPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getEightBitDigitalChannelOptionsPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(getXpBusOutputPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(getDigitalOutputPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(getLVDSControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(getXpBusControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                    .addComponent(getEightBitOptionsPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addComponent(getXpBusControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(getLVDSControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addComponent(getEightBitDigitalChannelColorControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(getEightBitColorControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(getEightBitColorControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(2, 2, 2)
-                        .addComponent(getXpBusOutputPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(getDigitalOutputPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(getLVDSControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(getEightBitDigitalChannelOptionsPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(getEightBitDigitalChannelColorControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(getXpBusControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                            .addComponent(getXpBusControlPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(getXpBusOutputPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(18, 18, 18)
-                        .addComponent(getLVDSControlPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(getEightBitOptionsPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap())
         );
     }
 
-    private JPanel getXpBusOutputPanel(){   
+    protected XpBusOutputPanel getXpBusOutputPanel(){   
         
         if(xpBusOutputPanel == null)    
-            xpBusOutputPanel = new XpBusOutputPanel();
+            xpBusOutputPanel = new XpBusOutputPanel(this.gui);
         return xpBusOutputPanel;
     }
     
-    private JPanel getXpBusControlPanel(){
+    protected XpBusControlPanel getXpBusControlPanel(){
         
         if(xpBusControlPanel == null)
-            xpBusControlPanel = new XpBusControlPanel();
+            xpBusControlPanel = new XpBusControlPanel(this.gui);
         return xpBusControlPanel;
         
     }
     
-    private JPanel getEightBitDigitalChannelColorControlPanel(){
+    protected EightBitColorControlPanel getEightBitColorControlPanel(){
 
-        if(eightBitDigitalChannelColorControlPanel == null)
-            eightBitDigitalChannelColorControlPanel = new EightBitDigitalChannelColorControlPanel();
-        return eightBitDigitalChannelColorControlPanel;
+        if(eightBitColorControlPanel == null)
+            eightBitColorControlPanel = new EightBitColorControlPanel(this.gui);
+        return eightBitColorControlPanel;
     }
 
-    private JPanel getLVDSControlPanel(){
+    protected LvdsControlPanel getLVDSControlPanel(){
             
         if(lvdsControlPanel == null)
-            lvdsControlPanel = new LvdsControlPanel();
+            lvdsControlPanel = new LvdsControlPanel(this.gui);
         return lvdsControlPanel;
     }
     
-    private JPanel getEightBitDigitalChannelOptionsPanel(){
+    protected EightBitOptionsPanel getEightBitOptionsPanel(){
     
-        if(eightBitDigitalChannelOptionsPanel == null)
-            eightBitDigitalChannelOptionsPanel = new EightBitDigitalChannelOptionsPanel();
-        return eightBitDigitalChannelOptionsPanel;
+        if(eightBitOptionsPanel == null)
+            eightBitOptionsPanel = new EightBitOptionsPanel(this.gui);
+        return eightBitOptionsPanel;
     }                                                            
-                                                      
-                
+
+    
+    protected JPanel getDigitalOutputPanel(){
+        if(digitalOutputPanel == null){
+            
+            digitalOutputPanel = new JPanel();
+            digitalOutputLabel = new JLabel();
+            digitalOutputEnableCheckBox = new JCheckBox();
+            
+            digitalOutputPanel.setBorder(BorderFactory.createEtchedBorder());
+
+            digitalOutputLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+            digitalOutputLabel.setText("Digital Output");
+
+            digitalOutputEnableCheckBox.setText("Digital Output Enabled");
+            digitalOutputEnableCheckBox.addActionListener(new ActionListener() {
+                public void actionPerformed(java.awt.event.ActionEvent evt) {
+                    boolean enable = digitalOutputEnableCheckBox.isSelected();
+                    setDigitalOutputEnableMessage(enable);
+                    greyOut(!enable);                    
+                }
+            });
+            digitalOutputEnableCheckBox.setSelected(false);
+            
+            GroupLayout digitalOutputPanelLayout = new GroupLayout(digitalOutputPanel);
+            digitalOutputPanel.setLayout(digitalOutputPanelLayout);
+            digitalOutputPanelLayout.setHorizontalGroup(
+                digitalOutputPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(digitalOutputPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(digitalOutputPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addComponent(digitalOutputLabel)
+                        .addComponent(digitalOutputEnableCheckBox))
+                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+            digitalOutputPanelLayout.setVerticalGroup(
+                digitalOutputPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                .addGroup(digitalOutputPanelLayout.createSequentialGroup()
+                    .addContainerGap()
+                    .addComponent(digitalOutputLabel)
+                    .addGap(18, 18, 18)
+                    .addComponent(digitalOutputEnableCheckBox)
+                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            );
+        }
+        return digitalOutputPanel;
+    }
+    
+    protected void setDigitalOutputEnableMessage(boolean enable){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_SET);
+        long arg = ThermalCamArguments.DIGITAL_OUTPUT_DISABLED.getArg();
+        if(enable)
+            arg = ThermalCamArguments.DIGITAL_OUTPUT_ENABLED.getArg();
+        msg.setArgs(gui.longtoTwoBytes(arg));
+        gui.sendCommand(msg);
+    }
+    
+    protected void getDigitalOutputEnableMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET);
+        gui.sendCommand(msg);
+    }
+    
+    protected void enableDigitalOutput(boolean enable){
+        this.digitalOutputEnabled = enable;
+        greyOut(!enable);
+    }
+    
+    protected boolean isDigitalOutputEnabled(){
+        return this.digitalOutputEnabled;
+    }
+    
+    protected void greyOut(boolean greyOut){
+        this.getXpBusOutputPanel().greyOut(greyOut);
+        this.getXpBusControlPanel().greyOut(greyOut);
+        this.getLVDSControlPanel().greyOut(greyOut);
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if(rec.getFunction() == ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET.getFunctionCode()){
+            if(sent.getByteCount() == ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET.getCmdByteCount()){
+                if((int)rec.getArgs()[1] == (int)ThermalCamArguments.DIGITAL_OUTPUT_ENABLED.getArg()){
+                    enableDigitalOutput(true);
+                } else if ((int)rec.getArgs()[1] == (int)ThermalCamArguments.DIGITAL_OUTPUT_DISABLED.getArg()){
+                    enableDigitalOutput(false);
+                }             
+            } else {
+                long subFunc = sent.getArgs()[0];
+                if (subFunc == 0x00){
+                    if((int)sent.getArgs()[1] == (int)ThermalCamArguments.DIGITAL_OUTPUT_ENABLED.getArg()){
+                        enableDigitalOutput(true);
+                    } else if ((int)sent.getArgs()[1] == (int)ThermalCamArguments.DIGITAL_OUTPUT_DISABLED.getArg()){
+                        enableDigitalOutput(false);
+                    }
+                    
+                } else if((subFunc == ThermalCamArguments.XP_MODE_GET.getArg()) 
+                        || (subFunc == ThermalCamArguments.XP_MODE_SET.getArg())){
+                    this.getXpBusOutputPanel().executeOnReply(sent, rec);
+                    
+                } else if ((subFunc == ThermalCamArguments.CMOS_BIT_DEPTH_GET.getArg())
+                        || (subFunc == ThermalCamArguments.CMOS_BIT_DEPTH_SET.getArg())){
+                    this.getXpBusControlPanel().executeOnReply(sent, rec);
+                    
+                } else if ((subFunc == ThermalCamArguments.DIGITAL_EZOOM_GET.getArg()) 
+                        || (subFunc == ThermalCamArguments.DIGITAL_EZOOM_SET.getArg())){
+                    this.getEightBitOptionsPanel().executeOnReply(sent, rec);
+                    
+                }  else if ((subFunc == ThermalCamArguments.DIGITAL_BAYER_ENCODE_GET.getArg()) 
+                        || (subFunc == ThermalCamArguments.DIGITAL_BAYER_ENCODE_SET.getArg())){
+                    this.getEightBitColorControlPanel().executeOnReply(sent, rec);
+                    
+                }  else if ((subFunc == ThermalCamArguments.LVDS_BIT_DEPTH_GET.getArg()) 
+                        || (subFunc == ThermalCamArguments.LVDS_BIT_DEPTH_SET.getArg())
+                        || (subFunc == ThermalCamArguments.LVDS_OUTPUT_ENABLE_GET.getArg())
+                        || (subFunc == ThermalCamArguments.LVDS_OUTPUT_ENABLE_SET.getArg())){
+                    this.getLVDSControlPanel().executeOnReply(sent, rec);
+                    
+                }
+            }
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        gui.sendCommand(sent);
+    }
+    
+   
+    
 }
+
+

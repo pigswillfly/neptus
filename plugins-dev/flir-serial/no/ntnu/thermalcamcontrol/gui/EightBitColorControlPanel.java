@@ -31,6 +31,9 @@
  */
 package no.ntnu.thermalcamcontrol.gui;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
@@ -40,18 +43,25 @@ import javax.swing.JPanel;
 import javax.swing.JRadioButton;
 import javax.swing.LayoutStyle;
 
+import no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction;
+import pt.lsts.imc.ThermalCamControl;
+
 /**
  * @author liz
  *
  */
-class EightBitDigitalChannelColorControlPanel extends JPanel {
+class EightBitColorControlPanel extends JPanel implements ReplyAction{
 
     /**
      * 
      */
     private static final long serialVersionUID = 1L;
     
-    private JLabel eightBitDigitalChannelColorControlLabel = null;
+    private ThermalCamControlGui gui;
+    
+    private long bayerOrder;
+    
+    private JLabel eightBitColorControlLabel = null;
     private JCheckBox colorizationEnableCheckBox = null;
     
     private JPanel bayerOrderPanel = null;
@@ -74,55 +84,50 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
     private JRadioButton yFirstRadioButton = null;
     private ButtonGroup yOrderButtonGroup = null;
     
-    protected EightBitDigitalChannelColorControlPanel(){
+    protected EightBitColorControlPanel(ThermalCamControlGui gui){
         super();
+        this.gui = gui;
         initialize();
     }
     
     private void initialize(){
-        eightBitDigitalChannelColorControlLabel = new JLabel();
+        eightBitColorControlLabel = new JLabel();
         colorizationEnableCheckBox = new JCheckBox();
         
         this.setBorder(BorderFactory.createEtchedBorder());
 
-        eightBitDigitalChannelColorControlLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
-        eightBitDigitalChannelColorControlLabel.setText("8-bit Digital Channel Colorization Controls");
+        eightBitColorControlLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
+        eightBitColorControlLabel.setText("8-bit Digital Channel Colorization Controls");
         colorizationEnableCheckBox.setText("Colorization Enable");
 
-        GroupLayout eightBitDigitalChannelColorControlPanelLayout = new GroupLayout(this);
-        this.setLayout(eightBitDigitalChannelColorControlPanelLayout);
-        eightBitDigitalChannelColorControlPanelLayout.setHorizontalGroup(
-            eightBitDigitalChannelColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(eightBitDigitalChannelColorControlPanelLayout.createSequentialGroup()
-                .addGroup(eightBitDigitalChannelColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(eightBitDigitalChannelColorControlPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(eightBitDigitalChannelColorControlLabel))
-                    .addGroup(eightBitDigitalChannelColorControlPanelLayout.createSequentialGroup()
-                        .addGap(43, 43, 43)
-                        .addGroup(eightBitDigitalChannelColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(getYSubSamplingPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(getYOrderPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(getBayerOrderPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addGroup(GroupLayout.Alignment.LEADING, eightBitDigitalChannelColorControlPanelLayout.createSequentialGroup()
-                                .addGap(32, 32, 32)
-                                .addComponent(colorizationEnableCheckBox)))))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-        );
-        eightBitDigitalChannelColorControlPanelLayout.setVerticalGroup(
-            eightBitDigitalChannelColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(eightBitDigitalChannelColorControlPanelLayout.createSequentialGroup()
+        GroupLayout eightBitColorControlPanelLayout = new GroupLayout(this);
+        this.setLayout(eightBitColorControlPanelLayout);
+        eightBitColorControlPanelLayout.setHorizontalGroup(
+            eightBitColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(eightBitColorControlPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(eightBitDigitalChannelColorControlLabel)
+                .addGroup(eightBitColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                    .addComponent(eightBitColorControlLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                    .addComponent(colorizationEnableCheckBox)
+                    .addComponent(getBayerOrderPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(getYSubSamplingPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(getYOrderPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap())
+        );
+        eightBitColorControlPanelLayout.setVerticalGroup(
+            eightBitColorControlPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
+            .addGroup(eightBitColorControlPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(eightBitColorControlLabel, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
-                .addComponent(getBayerOrderPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(getBayerOrderPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
-                .addComponent(getYSubSamplingPanel(), GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+                .addComponent(getYSubSamplingPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(getYOrderPanel(), GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(12, 12, 12)
+                .addGap(18, 18, 18)
                 .addComponent(colorizationEnableCheckBox)
-                .addGap(21, 21, 21))
+                .addContainerGap())
         );
     }
 
@@ -144,17 +149,40 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
             bayerOrderButtonGroup.add(bayerOrderBGFilterRadioButton);
             
             bayerOrderPanel.setBorder(BorderFactory.createEtchedBorder());
-    
-            bayerOrderGBFilterRadioButton.setText("GB Filter");
-    
-            bayerOrderGRFilterRadioButton.setText("GR Filter");
-    
-            bayerOrderRGFilterRadioButton.setText("RG Filter");
-    
             bayerOrderLabel.setFont(new java.awt.Font("Ubuntu", 1, 15)); // NOI18N
             bayerOrderLabel.setText("Bayer Order");
+            
+            bayerOrderGBFilterRadioButton.setText("GB Filter");
+            bayerOrderGBFilterRadioButton.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setBayerOrderMessage(ThermalCamArguments.BAYER_ENCODE_GB.getArg());
+                }
+            });
+    
+            bayerOrderGRFilterRadioButton.setText("GR Filter");
+            bayerOrderGRFilterRadioButton.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setBayerOrderMessage(ThermalCamArguments.BAYER_ENCODE_GR.getArg());
+                }
+            });
+    
+            bayerOrderRGFilterRadioButton.setText("RG Filter");
+            bayerOrderRGFilterRadioButton.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setBayerOrderMessage(ThermalCamArguments.BAYER_ENCODE_RG.getArg());
+                }
+            });
     
             bayerOrderBGFilterRadioButton.setText("BG Filter");
+            bayerOrderBGFilterRadioButton.addActionListener(new ActionListener(){
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    setBayerOrderMessage(ThermalCamArguments.BAYER_ENCODE_BG.getArg());
+                }
+            });
     
             GroupLayout bayerOrderPanelLayout = new GroupLayout(bayerOrderPanel);
             bayerOrderPanel.setLayout(bayerOrderPanelLayout);
@@ -168,11 +196,11 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                             .addGroup(bayerOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                                 .addComponent(bayerOrderGRFilterRadioButton)
                                 .addComponent(bayerOrderGBFilterRadioButton))
-                            .addGap(32, 32, 32)
+                            .addGap(18, 18, 18)
                             .addGroup(bayerOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(bayerOrderBGFilterRadioButton)
-                                .addComponent(bayerOrderRGFilterRadioButton))))
-                    .addContainerGap())
+                                .addComponent(bayerOrderRGFilterRadioButton)
+                                .addComponent(bayerOrderBGFilterRadioButton))))
+                    .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             bayerOrderPanelLayout.setVerticalGroup(
                 bayerOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
@@ -187,7 +215,7 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                     .addGroup(bayerOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
                         .addComponent(bayerOrderGBFilterRadioButton)
                         .addComponent(bayerOrderRGFilterRadioButton))
-                    .addContainerGap())
+                    .addGap(60, 60, 60))
             );
             bayerOrderGRFilterRadioButton.setSelected(true);
             }        
@@ -213,9 +241,11 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
             ySubSamplingLabel.setText("YCbCr Sub-Sampling");
     
             ySubSamplingCenterRadioButton.setText("422 Center");
+            ySubSamplingCenterRadioButton.setEnabled(false);
     
             ySubSamplingPositedRadioButton.setText("422 Posited");
-    
+            ySubSamplingPositedRadioButton.setEnabled(false);
+
             GroupLayout ySubSamplingPanelLayout = new GroupLayout(ySubSamplingPanel);
             ySubSamplingPanel.setLayout(ySubSamplingPanelLayout);
             ySubSamplingPanelLayout.setHorizontalGroup(
@@ -224,11 +254,8 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                     .addContainerGap()
                     .addGroup(ySubSamplingPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(ySubSamplingLabel)
-                        .addGroup(ySubSamplingPanelLayout.createSequentialGroup()
-                            .addGap(23, 23, 23)
-                            .addGroup(ySubSamplingPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(ySubSamplingPositedRadioButton)
-                                .addComponent(ySubSamplingCenterRadioButton))))
+                        .addComponent(ySubSamplingPositedRadioButton)
+                        .addComponent(ySubSamplingCenterRadioButton))
                     .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             ySubSamplingPanelLayout.setVerticalGroup(
@@ -240,7 +267,7 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                     .addComponent(ySubSamplingCenterRadioButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(ySubSamplingPositedRadioButton)
-                    .addContainerGap(18, Short.MAX_VALUE))
+                    .addContainerGap(56, Short.MAX_VALUE))
             );
         }
         return ySubSamplingPanel;
@@ -266,7 +293,9 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
             yOrderLabel.setText("YCbCr Order");
     
             cFirstRadioButton.setText("CbYCrY");
+            cFirstRadioButton.setEnabled(false);
             yFirstRadioButton.setText("YCbYCr");
+            yFirstRadioButton.setEnabled(false);
     
             GroupLayout yOrderPanelLayout = new GroupLayout(yOrderPanel);
             yOrderPanel.setLayout(yOrderPanelLayout);
@@ -276,11 +305,8 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                     .addContainerGap()
                     .addGroup(yOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(yOrderLabel)
-                        .addGroup(yOrderPanelLayout.createSequentialGroup()
-                            .addGap(23, 23, 23)
-                            .addGroup(yOrderPanelLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                                .addComponent(yFirstRadioButton)
-                                .addComponent(cFirstRadioButton))))
+                        .addComponent(yFirstRadioButton)
+                        .addComponent(cFirstRadioButton))
                     .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             );
             yOrderPanelLayout.setVerticalGroup(
@@ -292,12 +318,66 @@ class EightBitDigitalChannelColorControlPanel extends JPanel {
                     .addComponent(cFirstRadioButton)
                     .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                     .addComponent(yFirstRadioButton)
-                    .addContainerGap(26, Short.MAX_VALUE))
+                    .addContainerGap(58, Short.MAX_VALUE))
             );
 
         }
         
         return yOrderPanel;
+    }
+
+    private void setBayerOrderMessage(long setting){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_SET_SUB);
+        byte[] args = {(byte)ThermalCamArguments.DIGITAL_BAYER_ENCODE_SET.getArg(), (byte)setting};
+        msg.setArgs(args);
+        gui.sendCommand(msg);
+    }
+    
+    protected void getBayerOrderMessage(){
+        ThermalCamControl msg = ThermalCamFunctionCodes.encode(ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB);
+        msg.setArgs(gui.longtoTwoBytes(ThermalCamArguments.DIGITAL_BAYER_ENCODE_GET.getArg()));
+        gui.sendCommand(msg);
+    }
+    
+    protected void setBayerOrder(long setting){
+        if(setting == ThermalCamArguments.BAYER_ENCODE_BG.getArg()){
+            bayerOrderBGFilterRadioButton.setSelected(true);
+            this.bayerOrder = setting;
+        } else if(setting == ThermalCamArguments.BAYER_ENCODE_GB.getArg()){
+            bayerOrderGBFilterRadioButton.setSelected(true);
+            this.bayerOrder = setting;
+        } else if (setting == ThermalCamArguments.BAYER_ENCODE_GR.getArg()){
+            bayerOrderGRFilterRadioButton.setSelected(true);
+            this.bayerOrder = setting;
+        } else if (setting == ThermalCamArguments.BAYER_ENCODE_RG.getArg()){
+            bayerOrderRGFilterRadioButton.setSelected(true);
+            this.bayerOrder = setting;
+        }
+    }
+    
+    protected long getBayerOrder(){
+        return this.bayerOrder;
+    }
+    
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeOnReply(pt.lsts.imc.ThermalCamControl, pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeOnReply(ThermalCamControl sent, ThermalCamControl rec) {
+        if((rec.getFunction() == ThermalCamFunctionCodes.DIGITAL_OUTPUT_MODE_GET_SUB.getFunctionCode()) 
+                &&(((int)sent.getArgs()[0] == (int)ThermalCamArguments.DIGITAL_BAYER_ENCODE_GET.getArg()))
+                || ((int)sent.getArgs()[0] == (int)ThermalCamArguments.DIGITAL_BAYER_ENCODE_SET.getArg())){
+                   setBayerOrder((int)gui.twoBytesToLong(rec.getArgs()));
+               }             
+    }
+
+    /* (non-Javadoc)
+     * @see no.ntnu.thermalcamcontrol.gui.UseThermalCamMsgUpdater.ReplyAction#executeIfNoReply(pt.lsts.imc.ThermalCamControl)
+     */
+    @Override
+    public void executeIfNoReply(ThermalCamControl sent) {
+        // TODO Auto-generated method stub
+        
     }
      
 }
