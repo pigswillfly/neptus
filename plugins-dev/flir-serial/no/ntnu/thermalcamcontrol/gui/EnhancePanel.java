@@ -145,7 +145,7 @@ class EnhancePanel extends JPanel implements ReplyAction{
             public void actionPerformed(ActionEvent evt) {
                 int value = DDE_MAX + 1;
                 try {
-                    value = Integer.parseInt(aceTextField.getText());
+                    value = Integer.parseInt(ddeTextField.getText());
                 } catch(NumberFormatException error){
                     ddeTextField.setText(String.valueOf(getAce()));
                 }
@@ -176,7 +176,6 @@ class EnhancePanel extends JPanel implements ReplyAction{
                     value = Integer.parseInt(aceTextField.getText());
                 } catch(NumberFormatException error){
                     aceTextField.setText(String.valueOf(getAce()));
-                    aceSlider.setValue((int)value);
                 }
                 if(gui.isWithinRange(ACE_MIN, ACE_MAX, value)){
                     aceSlider.setValue(value);
